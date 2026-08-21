@@ -1,0 +1,25 @@
+<div class="bar" role="group" aria-label="Filter by category">
+  <button
+    type="button"
+    class="chip"
+    [class.selected]="selected() === 'ALL'"
+    [attr.aria-pressed]="selected() === 'ALL'"
+    (click)="selectedChange.emit('ALL')"
+  >
+    <ion-icon name="apps-outline" aria-hidden="true" />
+    <span>All</span>
+  </button>
+
+  @for (category of categories(); track category) {
+    <button
+      type="button"
+      class="chip"
+      [class.selected]="selected() === category"
+      [attr.aria-pressed]="selected() === category"
+      (click)="selectedChange.emit(category)"
+    >
+      <ion-icon [name]="meta[category].icon" aria-hidden="true" />
+      <span>{{ meta[category].label }}</span>
+    </button>
+  }
+</div>

@@ -1,0 +1,82 @@
+/* ──────────────────────────────────────────────────────────────
+   Ionic theming.
+
+   Ionic components are styled entirely through CSS custom properties.
+   Overriding these variables restyles every ion-* component at once —
+   there is no need to touch component styles.
+
+   Palette: warm off-white background with low-saturation accents.
+   ────────────────────────────────────────────────────────────── */
+
+:root {
+  /* ── Surfaces and text ── */
+  --ion-background-color: #f6f5f1;
+  --ion-background-color-rgb: 246, 245, 241;
+  --ion-text-color: #33372f;
+  --ion-text-color-rgb: 51, 55, 47;
+
+  --ion-item-background: #ffffff;
+  --ion-card-background: #ffffff;
+  --ion-toolbar-background: #f6f5f1;
+  --ion-border-color: #e3e0d8;
+
+  /* ── Primary: muted sage ── */
+  --ion-color-primary: #7c9082;
+  --ion-color-primary-rgb: 124, 144, 130;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #6d7f72;
+  --ion-color-primary-tint: #899b8f;
+
+  /* ── Success: "enough stock" ── */
+  --ion-color-success: #7fa37f;
+  --ion-color-success-rgb: 127, 163, 127;
+  --ion-color-success-contrast: #ffffff;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #708f70;
+  --ion-color-success-tint: #8cac8c;
+
+  /* ── Warning: "running low" ── */
+  --ion-color-warning: #d9a84e;
+  --ion-color-warning-rgb: 217, 168, 78;
+  --ion-color-warning-contrast: #33372f;
+  --ion-color-warning-contrast-rgb: 51, 55, 47;
+  --ion-color-warning-shade: #bf9445;
+  --ion-color-warning-tint: #ddb060;
+
+  /* ── Danger: "out of stock" ── */
+  --ion-color-danger: #c4756b;
+  --ion-color-danger-rgb: 196, 117, 107;
+  --ion-color-danger-contrast: #ffffff;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #ac675e;
+  --ion-color-danger-tint: #ca837a;
+
+  /* ── Medium: secondary text and inactive chips ── */
+  --ion-color-medium: #8d8f89;
+  --ion-color-medium-rgb: 141, 143, 137;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #7c7e79;
+  --ion-color-medium-tint: #989a95;
+
+  /* ── Light: subtle fills ── */
+  --ion-color-light: #eceae4;
+  --ion-color-light-rgb: 236, 234, 228;
+  --ion-color-light-contrast: #33372f;
+  --ion-color-light-contrast-rgb: 51, 55, 47;
+  --ion-color-light-shade: #d0cfc9;
+  --ion-color-light-tint: #eeece7;
+
+  /* ── App-specific tokens ── */
+  --app-radius: 16px;
+  --app-radius-sm: 12px;
+  --app-shadow: 0 1px 2px rgba(51, 55, 47, 0.04), 0 8px 24px rgba(51, 55, 47, 0.05);
+  --app-surface: #ffffff;
+  --app-text-muted: #7a7d75;
+
+  /* Soft status fills used behind the status pill. */
+  --app-status-out-soft: #f6e3e0;
+  --app-status-low-soft: #f8eeda;
+  --app-status-ok-soft: #e4eee4;
+}

@@ -1,0 +1,7 @@
+{
+  "name": "midepensa",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

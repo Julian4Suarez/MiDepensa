@@ -1,0 +1,40 @@
+.section {
+  padding: 16px 16px 4px;
+}
+
+h2 {
+  margin: 0 0 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--app-text-muted);
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.option {
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--ion-border-color);
+  background: var(--app-surface);
+  color: var(--app-text-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.option.selected {
+  background: var(--ion-color-primary);
+  border-color: var(--ion-color-primary);
+  color: var(--ion-color-primary-contrast);
+  font-weight: 600;
+}
+
+.save {
+  margin: 24px 16px 16px;
+}

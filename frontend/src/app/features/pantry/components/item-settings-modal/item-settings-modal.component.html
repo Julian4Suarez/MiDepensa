@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ item.product.name }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()" aria-label="Close">
+        <ion-icon slot="icon-only" name="close-outline" />
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="section">
+    <h2>View</h2>
+    <ion-segment
+      [value]="currentView()"
+      (ionChange)="selectedView.set($any($event.detail.value))"
+    >
+      @for (view of views; track view) {
+        <ion-segment-button [value]="view">
+          <ion-label>{{ viewMeta[view].label }}</ion-label>
+        </ion-segment-button>
+      }
+    </ion-segment>
+  </div>
+
+  <div class="section">
+    <h2>Category</h2>
+    <div class="options">
+      @for (category of categories; track category) {
+        <button
+          type="button"
+          class="option"
+          [class.selected]="currentCategory() === category"
+          [attr.aria-pressed]="currentCategory() === category"
+          (click)="selectedCategory.set(category)"
+        >
+          {{ categoryMeta[category].label }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <ion-button expand="block" class="save" (click)="save()">Save</ion-button>
+</ion-content>

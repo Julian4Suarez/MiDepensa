@@ -1,0 +1,52 @@
+<ion-content>
+  <main class="page">
+    <section class="hero">
+      <div class="badge" aria-hidden="true">
+        <ion-icon name="basket-outline" />
+      </div>
+      <h1>MiDepensa</h1>
+      <p class="text-muted">
+        Keep track of what your pantry is running out of. Mark each product as
+        <strong>enough</strong>, <strong>low</strong> or <strong>out</strong>, and turn it into a
+        shopping list in one tap.
+      </p>
+    </section>
+
+    <section class="create" aria-labelledby="create-title">
+      <h2 id="create-title">Create a pantry</h2>
+      <p class="text-muted">
+        No sign-up. Pick a name, keep the link, and open it from any device.
+      </p>
+
+      <form (ngSubmit)="create()">
+        <ion-input
+          label="Pantry name"
+          labelPlacement="stacked"
+          fill="outline"
+          placeholder="Familia Suárez"
+          maxlength="60"
+          autocomplete="off"
+          [ngModel]="name()"
+          (ngModelChange)="name.set($event)"
+          name="pantryName"
+        />
+
+        @if (slug()) {
+          <ion-note class="preview">/pantries/{{ slug() }}</ion-note>
+        }
+
+        @if (error()) {
+          <ion-note color="danger" class="error" role="alert">{{ error() }}</ion-note>
+        }
+
+        <ion-button type="submit" expand="block" [disabled]="!canSubmit()">
+          @if (submitting()) {
+            <ion-spinner name="crescent" />
+          } @else {
+            Create pantry
+          }
+        </ion-button>
+      </form>
+    </section>
+  </main>
+</ion-content>

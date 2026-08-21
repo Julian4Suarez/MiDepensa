@@ -1,0 +1,84 @@
+# Full stack for every environment. Driven by scripts/deploy.sh, which passes
+# --env-file .env.<environment>.
+name: midepensa
+
+services:
+  postgres:
+    image: ${POSTGRES_IMAGE}
+    container_name: midepensa_${ENV}_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+
+  backend:
+    image: ${BACKEND_IMAGE}
+    build:
+      context: ../backend
+    container_name: midepensa_${ENV}_backend
+    restart: unless-stopped
+    # Bound to the loopback interface: a host reverse proxy handles public
+    # traffic, so nothing is exposed on the network by accident.
+    ports:
+      - "127.0.0.1:${BACKEND_PORT}:8080"
+    environment:
+      BACKEND_HOST: 0.0.0.0
+      BACKEND_PORT: 8080
+      AUTO_MIGRATE: ${AUTO_MIGRATE}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      CORS_ORIGINS: ${CORS_ORIGINS}
+      LOG_LEVEL: ${LOG_LEVEL}
+      LOG_FORMAT: ${LOG_FORMAT}
+    healthcheck:
+      # -O /dev/null issues a GET; --spider would send HEAD, which gin does not route.
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8080/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - internal
+
+  frontend:
+    image: ${FRONTEND_IMAGE}
+    build:
+      context: ../frontend
+    container_name: midepensa_${ENV}_frontend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT}:8080"
+    environment:
+      BACKEND_URL: ${PUBLIC_BACKEND_URL}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - internal
+
+volumes:
+  postgres_data:
+
+networks:
+  internal:
+    driver: bridge
