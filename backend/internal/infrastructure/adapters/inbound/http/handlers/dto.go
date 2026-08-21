@@ -16,7 +16,7 @@ type createPantryRequest struct {
 // Every field is optional; omitted fields are left untouched.
 type updateItemRequest struct {
 	Status   *entities.StockStatus `json:"status"`
-	View     *entities.PantryView  `json:"view"`
+	Type     *entities.ProductType `json:"type"`
 	Category *entities.Category    `json:"category"`
 }
 
@@ -47,7 +47,7 @@ type productResponse struct {
 type itemResponse struct {
 	Product   productResponse `json:"product"`
 	Status    string          `json:"status"`
-	View      string          `json:"view"`
+	Type      string          `json:"type"`
 	Category  string          `json:"category"`
 	UpdatedAt time.Time       `json:"updatedAt"`
 }
@@ -56,7 +56,7 @@ type itemResponse struct {
 type catalogResponse struct {
 	Products   []productResponse `json:"products"`
 	Categories []string          `json:"categories"`
-	Views      []string          `json:"views"`
+	Types      []string          `json:"types"`
 	Statuses   []string          `json:"statuses"`
 }
 
@@ -83,7 +83,7 @@ func toItemResponse(item entities.PantryItem) itemResponse {
 	return itemResponse{
 		Product:   toProductResponse(item.Product),
 		Status:    string(item.Status),
-		View:      string(item.View),
+		Type:      string(item.Type),
 		Category:  string(item.Category),
 		UpdatedAt: item.UpdatedAt,
 	}

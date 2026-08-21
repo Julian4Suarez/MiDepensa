@@ -24,7 +24,7 @@ endif
 # ─── .PHONY ─────────────────────────────────────────────────
 
 .PHONY: help deps dev build \
-	lint lint-fix fmt fmt-check \
+	lint lint-fix fmt fmt-check typecheck \
 	test test-watch test-ci \
 	docker-build docker-start docker-stop \
 	clean
@@ -42,8 +42,9 @@ help:
 	@echo "    build            - Production build into www/"
 	@echo ""
 	@echo "  Code quality:"
-	@echo "    lint             - Run ESLint"
+	@echo "    lint             - Type-check the specs and run ESLint"
 	@echo "    lint-fix         - Run ESLint with --fix"
+	@echo "    typecheck        - Type-check the specs (the Jest transformer does not)"
 	@echo "    fmt              - Format with Prettier"
 	@echo "    fmt-check        - Check formatting without writing"
 	@echo ""
@@ -78,7 +79,12 @@ build: deps
 # Code quality
 # ═══════════════════════════════════════════════════════════════
 
-lint:
+# The Jest transformer strips types without checking them, so a wrong enum
+# literal in a spec would only surface as a failing assertion.
+typecheck:
+	$(RUN) npx tsc -p tsconfig.spec.json --noEmit
+
+lint: typecheck
 	$(RUN) npx eslint src
 
 lint-fix:

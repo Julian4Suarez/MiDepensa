@@ -49,8 +49,8 @@ func (m *mockProductRepository) List(ctx context.Context) ([]entities.Product, e
 
 func catalogOfTwo() []entities.Product {
 	return []entities.Product{
-		{ID: uuid.New(), Code: "tomato", DefaultCategory: entities.CategoryFruitVeg, DefaultView: entities.ViewPrimary},
-		{ID: uuid.New(), Code: "rice", DefaultCategory: entities.CategoryDryCanned, DefaultView: entities.ViewSecondary},
+		{ID: uuid.New(), Code: "tomato", DefaultCategory: entities.CategoryFruitVeg, DefaultType: entities.TypeEssential},
+		{ID: uuid.New(), Code: "rice", DefaultCategory: entities.CategoryDryCanned, DefaultType: entities.TypeSecondary},
 	}
 }
 
@@ -73,7 +73,7 @@ func TestCreate_WithValidName_SeedsOneItemPerCatalogProduct(t *testing.T) {
 	assert.Equal(t, "familia-suarez", pantry.Slug.String())
 	require.Len(t, seeded, 2)
 	assert.Equal(t, entities.StatusOK, seeded[0].Status)
-	assert.Equal(t, entities.ViewPrimary, seeded[0].View)
+	assert.Equal(t, entities.TypeEssential, seeded[0].Type)
 }
 
 func TestCreate_WithTakenSlug_ReturnsConflictError(t *testing.T) {

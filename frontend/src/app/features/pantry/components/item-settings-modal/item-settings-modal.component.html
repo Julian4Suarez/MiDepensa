@@ -11,14 +11,14 @@
 
 <ion-content>
   <div class="section">
-    <h2>View</h2>
+    <h2>Type</h2>
     <ion-segment
-      [value]="currentView()"
-      (ionChange)="selectedView.set($any($event.detail.value))"
+      [value]="currentType()"
+      (ionChange)="selectedType.set($any($event.detail.value))"
     >
-      @for (view of views; track view) {
-        <ion-segment-button [value]="view">
-          <ion-label>{{ viewMeta[view].label }}</ion-label>
+      @for (type of types; track type) {
+        <ion-segment-button [value]="type">
+          <ion-label>{{ typeMeta[type].label }}</ion-label>
         </ion-segment-button>
       }
     </ion-segment>

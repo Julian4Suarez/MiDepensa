@@ -2,14 +2,14 @@ import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 
 import { PantryApiService } from '../../core/services/pantry-api.service';
-import type { Category, PantryItem, PantryView } from '../../shared/models/pantry.model';
+import type { Category, PantryItem, ProductType } from '../../shared/models/pantry.model';
 import { PantryStore } from './pantry.store';
 
-function item(name: string, view: PantryView, category: Category): PantryItem {
+function item(name: string, type: ProductType, category: Category): PantryItem {
   return {
     product: { id: name, code: name, name, image: `${name}.svg` },
     status: 'OK',
-    view,
+    type,
     category,
     updatedAt: '2026-01-01T00:00:00Z',
   };
@@ -17,9 +17,9 @@ function item(name: string, view: PantryView, category: Category): PantryItem {
 
 describe('PantryStore', () => {
   const items = [
-    item('Tomatoes', 'PRIMARY', 'FRUIT_VEG'),
-    item('Rice', 'PRIMARY', 'DRY_CANNED'),
-    item('Wine', 'OTHER', 'DRINKS'),
+    item('Tomatoes', 'ESSENTIAL', 'FRUIT_VEG'),
+    item('Rice', 'ESSENTIAL', 'DRY_CANNED'),
+    item('Wine', 'OTHERS', 'DRINKS'),
   ];
 
   let api: jest.Mocked<Pick<PantryApiService, 'getPantry' | 'updateItem'>>;
@@ -51,16 +51,19 @@ describe('PantryStore', () => {
     await store.load('familia');
   }
 
-  it('filters by the selected view', async () => {
+  it('filters by the selected type', async () => {
     await loadPantry();
 
     expect(store.visibleItems().map((i) => i.product.name)).toEqual(['Tomatoes', 'Rice']);
 
-    store.view.set('OTHER');
+    store.selectType('OTHERS');
     expect(store.visibleItems().map((i) => i.product.name)).toEqual(['Wine']);
+
+    store.selectType('ALL');
+    expect(store.visibleItems()).toHaveLength(3);
   });
 
-  it('filters by the selected category inside the view', async () => {
+  it('filters by the selected category inside the type', async () => {
     await loadPantry();
 
     store.category.set('DRY_CANNED');
@@ -68,10 +71,20 @@ describe('PantryStore', () => {
     expect(store.visibleItems().map((i) => i.product.name)).toEqual(['Rice']);
   });
 
-  it('only offers chips for categories present in the view', async () => {
+  it('only offers chips for categories present under the current type', async () => {
     await loadPantry();
 
     expect(store.availableCategories()).toEqual(['FRUIT_VEG', 'DRY_CANNED']);
+  });
+
+  it('resets the category when the type changes, so nothing filters to nothing', async () => {
+    await loadPantry();
+    store.category.set('DRY_CANNED');
+
+    store.selectType('OTHERS');
+
+    expect(store.category()).toBe('ALL');
+    expect(store.visibleItems().map((i) => i.product.name)).toEqual(['Wine']);
   });
 
   it('cycles the status and persists it', async () => {

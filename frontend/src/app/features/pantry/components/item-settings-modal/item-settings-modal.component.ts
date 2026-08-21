@@ -15,16 +15,17 @@ import {
 import { addIcons } from 'ionicons';
 import { closeOutline } from 'ionicons/icons';
 
-import { CATEGORIES, CATEGORY_META, VIEWS, VIEW_META } from '../../../../shared/models/pantry.meta';
+import { CATEGORIES, CATEGORY_META, TYPES, TYPE_META } from '../../../../shared/models/pantry.meta';
 import type {
   Category,
   ItemPatch,
   PantryItem,
-  PantryView,
+  ProductType,
 } from '../../../../shared/models/pantry.model';
 
 /**
- * Bottom sheet to move a product to another view or category.
+ * Bottom sheet to change how often a product is bought, or which aisle it
+ * belongs to.
  *
  * Dismisses with an {@link ItemPatch} when something changed, or with no data
  * when the user cancels.
@@ -57,20 +58,20 @@ export class ItemSettingsModalComponent {
    */
   item!: PantryItem;
 
-  protected readonly views = VIEWS;
-  protected readonly viewMeta = VIEW_META;
+  protected readonly types = TYPES;
+  protected readonly typeMeta = TYPE_META;
   protected readonly categories = CATEGORIES;
   protected readonly categoryMeta = CATEGORY_META;
 
-  protected readonly selectedView = signal<PantryView | null>(null);
+  protected readonly selectedType = signal<ProductType | null>(null);
   protected readonly selectedCategory = signal<Category | null>(null);
 
   constructor() {
     addIcons({ closeOutline });
   }
 
-  protected currentView(): PantryView {
-    return this.selectedView() ?? this.item.view;
+  protected currentType(): ProductType {
+    return this.selectedType() ?? this.item.type;
   }
 
   protected currentCategory(): Category {
@@ -83,8 +84,8 @@ export class ItemSettingsModalComponent {
 
   protected save(): void {
     const patch: ItemPatch = {};
-    if (this.currentView() !== this.item.view) {
-      patch.view = this.currentView();
+    if (this.currentType() !== this.item.type) {
+      patch.type = this.currentType();
     }
     if (this.currentCategory() !== this.item.category) {
       patch.category = this.currentCategory();

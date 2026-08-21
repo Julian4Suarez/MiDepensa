@@ -4,29 +4,35 @@
 
 A **pantry** is a named collection reachable at `/pantries/{slug}`. Every pantry
 holds one **item** per catalog **product**. An item carries three pieces of
-state: how much is left (**status**), which section it belongs to (**view**), and
-what kind of product it is (**category**). The catalog itself is global,
-read-only and seeded by a migration.
+state: how much is left (**status**), how often you buy it (**type**), and what
+kind of product it is (**category**). The catalog itself is global, read-only
+and seeded by a migration.
 
 ```
 Pantry 1 ──── * PantryItem * ──── 1 Product
-"familia-suarez"   OUT / PRIMARY / FRUIT_VEG   "tomato"
+"familia-suarez"   OUT / ESSENTIAL / FRUIT_VEG   "tomato"
 ```
 
 | Enum | Values |
 | --- | --- |
 | `StockStatus` | `OUT` (red), `LOW` (amber), `OK` (green) |
-| `PantryView` | `PRIMARY`, `SECONDARY`, `OTHER` |
+| `ProductType` | `ESSENTIAL`, `SECONDARY`, `OTHERS` |
 | `Category` | `FRUIT_VEG`, `MEAT_FISH`, `DAIRY_EGGS`, `DRY_CANNED`, `DRINKS`, `HOME_CARE` |
 
-Views encode *priority* (how often you check the product); categories mirror
+Type and category are two independent axes, and the pantry screen exposes both
+as filter bars: type answers *how often do I buy this*, category mirrors
 **supermarket aisles**, because the generated shopping list is grouped by
 category and should follow the route you walk through the shop.
 
-The first version used four categories (`FRESH`, `PANTRY`, `DRINKS`,
-`HOME_CARE`). It was replaced in migration `000003` because `PANTRY` collided
-with the name of the app and `FRESH` held 44% of the catalog, which makes it
-useless as a filter.
+Two earlier designs were replaced:
+
+- Four categories (`FRESH`, `PANTRY`, `DRINKS`, `HOME_CARE`) — migration `000003`.
+  `PANTRY` collided with the name of the app and `FRESH` held 44% of the
+  catalog, which makes it useless as a filter.
+- Three *views* (`PRIMARY`, `SECONDARY`, `OTHER`) selected from a side menu —
+  migration `000004`. Views and categories both filtered the grid, so having two
+  different interactions for the same job was needless. They are now the type
+  filter, on the same screen.
 
 ## Slugs
 
@@ -118,7 +124,7 @@ Base path `/v1`.
 | `GET` | `/v1/catalog` | Products plus the valid enum values |
 | `POST` | `/v1/pantries` | `{ "name": "Familia Suárez" }` → 201 with the slug |
 | `GET` | `/v1/pantries/{slug}` | Pantry with all items |
-| `PATCH` | `/v1/pantries/{slug}/items/{productId}` | `{ status?, view?, category? }` |
+| `PATCH` | `/v1/pantries/{slug}/items/{productId}` | `{ status?, type?, category? }` |
 
 Creating a pantry inserts the pantry row and all 57 item rows in one
 transaction; a slug collision rolls the whole thing back and returns `409`. The
@@ -151,8 +157,9 @@ PostgreSQL 16. Three tables, defined in
   `ON DELETE CASCADE` from the pantry
 
 Every enum column has a `CHECK` constraint, so invalid data cannot exist even if
-a bug slips past the Go validation. The `view` column is named `pantry_view` to
-avoid shadowing the SQL keyword.
+a bug slips past the Go validation. Renaming an enum therefore means dropping
+the constraint, rewriting the values and adding it back — see migrations `000003`
+and `000004`.
 
 Migrations are embedded with `//go:embed *.sql`, so the binary carries its own
 schema and the container image needs no extra files.
@@ -177,8 +184,12 @@ There is no authentication, by design. Anyone with the link can edit the pantry.
 | --- | --- | --- | --- |
 | Unit | `backend/test/unit` | nothing | Slug rules, entity invariants, service branching |
 | Integration | `backend/test/integration` | PostgreSQL | SQL, constraints, partial updates, scanning |
-| Unit (frontend) | `frontend/src/**/*.spec.ts` | nothing | Slugify, shopping list, store filtering and rollback |
+| Unit (frontend) | `frontend/src/**/*.spec.ts` | nothing | Slugify, shopping list, sorting, store filtering and rollback |
 
 Mocks are hand-written structs with function fields — no mocking framework.
 Integration tests are behind the `integration` build tag so `go test ./...`
 stays fast and dependency-free.
+
+The Jest transformer strips types without checking them, so `make -C frontend
+lint` runs `tsc --noEmit` over `tsconfig.spec.json` first: without it a wrong
+enum literal in a spec only shows up as a confusing failed assertion.

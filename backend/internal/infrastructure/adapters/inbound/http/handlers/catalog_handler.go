@@ -31,7 +31,7 @@ func (h *CatalogHandler) Get(c *gin.Context) {
 	response := catalogResponse{
 		Products:   make([]productResponse, 0, len(products)),
 		Categories: enumValues(entities.Categories),
-		Views:      enumValues(entities.PantryViews),
+		Types:      enumValues(entities.ProductTypes),
 		Statuses:   enumValues(entities.StockStatuses),
 	}
 	for _, product := range products {

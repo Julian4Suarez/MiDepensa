@@ -78,7 +78,7 @@ func (h *PantryHandler) UpdateItem(c *gin.Context) {
 
 	item, err := h.service.UpdateItem(c.Request.Context(), slug, productID, entities.ItemPatch{
 		Status:   request.Status,
-		View:     request.View,
+		Type:     request.Type,
 		Category: request.Category,
 	})
 	if err != nil {

@@ -1,4 +1,7 @@
-import type { Category, PantryView, SortMode, StockStatus } from './pantry.model';
+import type { Category, ProductType, SortMode, StockStatus } from './pantry.model';
+
+/** Icon used by the "All" chip of every filter bar. */
+export const ALL_ICON = 'apps-outline';
 
 /**
  * Display order of the six categories. They follow the order in which you walk
@@ -22,13 +25,13 @@ export const CATEGORY_META: Record<Category, { label: string; icon: string }> = 
   HOME_CARE: { label: 'Home & care', icon: 'sparkles-outline' },
 };
 
-/** Display order and labelling of the three pantry views. */
-export const VIEWS: readonly PantryView[] = ['PRIMARY', 'SECONDARY', 'OTHER'];
+/** Display order and labelling of the three product types. */
+export const TYPES: readonly ProductType[] = ['ESSENTIAL', 'SECONDARY', 'OTHERS'];
 
-export const VIEW_META: Record<PantryView, { label: string; icon: string }> = {
-  PRIMARY: { label: 'Primary', icon: 'star-outline' },
+export const TYPE_META: Record<ProductType, { label: string; icon: string }> = {
+  ESSENTIAL: { label: 'Essential', icon: 'star-outline' },
   SECONDARY: { label: 'Secondary', icon: 'bookmark-outline' },
-  OTHER: { label: 'Other', icon: 'apps-outline' },
+  OTHERS: { label: 'Others', icon: 'ellipsis-horizontal-outline' },
 };
 
 export const STATUS_META: Record<StockStatus, { label: string; color: string }> = {

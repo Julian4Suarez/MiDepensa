@@ -25,12 +25,12 @@ func TestNewPantry_WithBlankName_ReturnsError(t *testing.T) {
 	assert.ErrorIs(t, err, entities.ErrPantryNameEmpty)
 }
 
-func TestNewPantryItem_TakesCategoryAndViewFromCatalogDefaults(t *testing.T) {
+func TestNewPantryItem_TakesCategoryAndTypeFromCatalogDefaults(t *testing.T) {
 	product := entities.Product{
 		ID:              uuid.New(),
 		Code:            "tomato",
 		DefaultCategory: entities.CategoryFruitVeg,
-		DefaultView:     entities.ViewPrimary,
+		DefaultType:     entities.TypeEssential,
 	}
 	pantryID := uuid.New()
 
@@ -39,23 +39,23 @@ func TestNewPantryItem_TakesCategoryAndViewFromCatalogDefaults(t *testing.T) {
 	assert.Equal(t, pantryID, item.PantryID)
 	assert.Equal(t, entities.StatusOK, item.Status)
 	assert.Equal(t, entities.CategoryFruitVeg, item.Category)
-	assert.Equal(t, entities.ViewPrimary, item.View)
+	assert.Equal(t, entities.TypeEssential, item.Type)
 }
 
 func TestItemPatch_Validate_RejectsUnknownEnumValues(t *testing.T) {
 	unknownStatus := entities.StockStatus("SOLD_OUT")
-	unknownView := entities.PantryView("FAVOURITES")
+	unknownType := entities.ProductType("FAVOURITES")
 	unknownCategory := entities.Category("PETS")
 
 	assert.ErrorIs(t, entities.ItemPatch{Status: &unknownStatus}.Validate(), entities.ErrInvalidItemPatch)
-	assert.ErrorIs(t, entities.ItemPatch{View: &unknownView}.Validate(), entities.ErrInvalidItemPatch)
+	assert.ErrorIs(t, entities.ItemPatch{Type: &unknownType}.Validate(), entities.ErrInvalidItemPatch)
 	assert.ErrorIs(t, entities.ItemPatch{Category: &unknownCategory}.Validate(), entities.ErrInvalidItemPatch)
 }
 
 func TestItemPatch_Apply_OnlyChangesProvidedFields(t *testing.T) {
 	item := entities.PantryItem{
 		Status:   entities.StatusOK,
-		View:     entities.ViewPrimary,
+		Type:     entities.TypeEssential,
 		Category: entities.CategoryFruitVeg,
 	}
 	status := entities.StatusOut
@@ -63,7 +63,7 @@ func TestItemPatch_Apply_OnlyChangesProvidedFields(t *testing.T) {
 	item.Apply(entities.ItemPatch{Status: &status})
 
 	assert.Equal(t, entities.StatusOut, item.Status)
-	assert.Equal(t, entities.ViewPrimary, item.View)
+	assert.Equal(t, entities.TypeEssential, item.Type)
 	assert.Equal(t, entities.CategoryFruitVeg, item.Category)
 }
 

@@ -3,6 +3,8 @@
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
     "module": "CommonJS",
+    // Jest resolves CommonJS, so the base "bundler" resolution does not apply.
+    "moduleResolution": "node10",
     "types": ["jest", "node"],
     "esModuleInterop": true
   },

@@ -4,14 +4,15 @@ import { firstValueFrom } from 'rxjs';
 import { PantryApiService } from '../../core/services/pantry-api.service';
 import { sortItems } from '../../core/utils/sort-items';
 import { CATEGORIES, NEXT_STATUS } from '../../shared/models/pantry.meta';
-import type {
-  Category,
-  CategoryFilter,
-  ItemPatch,
-  Pantry,
-  PantryItem,
-  PantryView,
-  SortMode,
+import {
+  ALL,
+  type Category,
+  type CategoryFilter,
+  type ItemPatch,
+  type Pantry,
+  type PantryItem,
+  type SortMode,
+  type TypeFilter,
 } from '../../shared/models/pantry.model';
 
 /**
@@ -19,7 +20,7 @@ import type {
  *
  * Provided by the pantry route rather than in root, so navigating away disposes
  * the state. Everything the template needs is a signal or a computed signal:
- * changing `view` or `category` re-renders the grid without any subscription.
+ * changing a filter re-renders the grid without any subscription.
  */
 @Injectable()
 export class PantryStore {
@@ -28,47 +29,35 @@ export class PantryStore {
   // ── Writable state ────────────────────────────────────────
   readonly pantry = signal<Pantry | null>(null);
   readonly items = signal<PantryItem[]>([]);
-  readonly view = signal<PantryView>('PRIMARY');
-  readonly category = signal<CategoryFilter>('ALL');
+  // Opens on the products bought every time, which is the common case.
+  readonly type = signal<TypeFilter>('ESSENTIAL');
+  readonly category = signal<CategoryFilter>(ALL);
   readonly sort = signal<SortMode>('DEFAULT');
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
 
   // ── Derived state ─────────────────────────────────────────
 
-  /** Items filed under the selected view, ignoring the category filter. */
-  readonly itemsInView = computed(() => this.items().filter((item) => item.view === this.view()));
+  /** Items matching the type filter, before narrowing down by category. */
+  readonly itemsOfType = computed(() => {
+    const type = this.type();
+    return type === ALL ? this.items() : this.items().filter((item) => item.type === type);
+  });
 
-  /** Items shown in the grid: selected view, then category, then sort order. */
+  /** Items shown in the grid: type, then category, then sort order. */
   readonly visibleItems = computed(() => {
     const category = this.category();
     const filtered =
-      category === 'ALL'
-        ? this.itemsInView()
-        : this.itemsInView().filter((item) => item.category === category);
+      category === ALL
+        ? this.itemsOfType()
+        : this.itemsOfType().filter((item) => item.category === category);
 
     return sortItems(filtered, this.sort());
   });
 
-  /** Only the categories actually present in the current view get a chip. */
+  /** Only the categories actually present under the current type get a chip. */
   readonly availableCategories = computed<Category[]>(() =>
-    CATEGORIES.filter((category) => this.itemsInView().some((item) => item.category === category)),
-  );
-
-  /** How many products each view needs restocking, shown in the side menu. */
-  readonly missingByView = computed<Record<PantryView, number>>(() => {
-    const counts: Record<PantryView, number> = { PRIMARY: 0, SECONDARY: 0, OTHER: 0 };
-    for (const item of this.items()) {
-      if (item.status !== 'OK') {
-        counts[item.view] += 1;
-      }
-    }
-    return counts;
-  });
-
-  /** Number of products in the current view that need buying. */
-  readonly missingInView = computed(
-    () => this.itemsInView().filter((item) => item.status !== 'OK').length,
+    CATEGORIES.filter((category) => this.itemsOfType().some((item) => item.category === category)),
   );
 
   // ── Commands ──────────────────────────────────────────────
@@ -87,6 +76,12 @@ export class PantryStore {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  /** Narrowing by type can leave the category filter pointing at nothing. */
+  selectType(type: TypeFilter): void {
+    this.type.set(type);
+    this.category.set(ALL);
   }
 
   /** Advances an item to the next stock status. */

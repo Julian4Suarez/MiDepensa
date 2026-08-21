@@ -56,14 +56,14 @@ func (r *postgresPantryRepository) Create(
 
 	_, err = tx.CopyFrom(ctx,
 		pgx.Identifier{"pantry_items"},
-		[]string{"pantry_id", "product_id", "status", "pantry_view", "category", "updated_at"},
+		[]string{"pantry_id", "product_id", "status", "product_type", "category", "updated_at"},
 		pgx.CopyFromSlice(len(items), func(i int) ([]any, error) {
 			item := items[i]
 			return []any{
 				item.PantryID,
 				item.Product.ID,
 				string(item.Status),
-				string(item.View),
+				string(item.Type),
 				string(item.Category),
 				item.UpdatedAt,
 			}, nil
@@ -110,7 +110,7 @@ func (r *postgresPantryRepository) ListItems(
 	pantryID uuid.UUID,
 ) ([]entities.PantryItem, error) {
 	rows, err := r.pool.Query(ctx,
-		`SELECT `+productColumns+`, i.status, i.pantry_view, i.category, i.updated_at
+		`SELECT `+productColumns+`, i.status, i.product_type, i.category, i.updated_at
 		 FROM pantry_items i
 		 JOIN products p ON p.id = i.product_id
 		 WHERE i.pantry_id = $1
@@ -146,20 +146,20 @@ func (r *postgresPantryRepository) UpdateItem(
 	row := r.pool.QueryRow(ctx,
 		`WITH updated AS (
 		     UPDATE pantry_items
-		     SET status      = COALESCE($3, status),
-		         pantry_view = COALESCE($4, pantry_view),
-		         category    = COALESCE($5, category),
-		         updated_at  = now()
+		     SET status       = COALESCE($3, status),
+		         product_type = COALESCE($4, product_type),
+		         category     = COALESCE($5, category),
+		         updated_at   = now()
 		     WHERE pantry_id = $1 AND product_id = $2
-		     RETURNING product_id, status, pantry_view, category, updated_at
+		     RETURNING product_id, status, product_type, category, updated_at
 		 )
-		 SELECT `+productColumns+`, u.status, u.pantry_view, u.category, u.updated_at
+		 SELECT `+productColumns+`, u.status, u.product_type, u.category, u.updated_at
 		 FROM updated u
 		 JOIN products p ON p.id = u.product_id`,
 		pantryID,
 		productID,
 		optionalString(patch.Status),
-		optionalString(patch.View),
+		optionalString(patch.Type),
 		optionalString(patch.Category),
 	)
 
@@ -181,10 +181,10 @@ func scanPantryItem(row pgx.Row, pantryID uuid.UUID) (entities.PantryItem, error
 		&item.Product.Name,
 		&item.Product.Image,
 		&item.Product.DefaultCategory,
-		&item.Product.DefaultView,
+		&item.Product.DefaultType,
 		&item.Product.SortOrder,
 		&item.Status,
-		&item.View,
+		&item.Type,
 		&item.Category,
 		&item.UpdatedAt,
 	); err != nil {

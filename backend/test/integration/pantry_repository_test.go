@@ -96,7 +96,7 @@ func TestPantryRepository_UpdateItem_AppliesOnlyProvidedFields(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, entities.StatusOut, updated.Status)
-	assert.Equal(t, original.View, updated.View, "view must be untouched")
+	assert.Equal(t, original.Type, updated.Type, "type must be untouched")
 	assert.Equal(t, original.Category, updated.Category, "category must be untouched")
 	assert.Equal(t, product.Code, updated.Product.Code)
 }

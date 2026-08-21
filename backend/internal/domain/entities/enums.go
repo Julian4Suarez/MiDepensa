@@ -25,25 +25,26 @@ func (s StockStatus) IsValid() bool {
 	}
 }
 
-// PantryView is the section of the pantry a product is filed under.
-type PantryView string
+// ProductType is how often a product is bought. It is the coarse filter of the
+// pantry screen, alongside Category.
+type ProductType string
 
 const (
-	// ViewPrimary holds the products checked on every shopping trip.
-	ViewPrimary PantryView = "PRIMARY"
-	// ViewSecondary holds the products checked occasionally.
-	ViewSecondary PantryView = "SECONDARY"
-	// ViewOther holds everything else.
-	ViewOther PantryView = "OTHER"
+	// TypeEssential is bought on every shopping trip.
+	TypeEssential ProductType = "ESSENTIAL"
+	// TypeSecondary is bought from time to time.
+	TypeSecondary ProductType = "SECONDARY"
+	// TypeOthers is rarely or never bought.
+	TypeOthers ProductType = "OTHERS"
 )
 
-// PantryViews lists every view in display order.
-var PantryViews = []PantryView{ViewPrimary, ViewSecondary, ViewOther}
+// ProductTypes lists every type in display order.
+var ProductTypes = []ProductType{TypeEssential, TypeSecondary, TypeOthers}
 
-// IsValid reports whether the view is one of the known values.
-func (v PantryView) IsValid() bool {
-	switch v {
-	case ViewPrimary, ViewSecondary, ViewOther:
+// IsValid reports whether the type is one of the known values.
+func (t ProductType) IsValid() bool {
+	switch t {
+	case TypeEssential, TypeSecondary, TypeOthers:
 		return true
 	default:
 		return false

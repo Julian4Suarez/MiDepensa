@@ -1,8 +1,8 @@
 /** How much of a product is left. Mirrors the backend enum. */
 export type StockStatus = 'OUT' | 'LOW' | 'OK';
 
-/** Section of the pantry a product is filed under. */
-export type PantryView = 'PRIMARY' | 'SECONDARY' | 'OTHER';
+/** How often a product is bought. The coarse filter of the pantry screen. */
+export type ProductType = 'ESSENTIAL' | 'SECONDARY' | 'OTHERS';
 
 /** Product group used for quick filtering, mirroring supermarket aisles. */
 export type Category =
@@ -13,8 +13,10 @@ export type Category =
   | 'DRINKS'
   | 'HOME_CARE';
 
-/** Sentinel used by the filter bar when no category is selected. */
-export type CategoryFilter = Category | 'ALL';
+/** Sentinel used by the filter bars when nothing is narrowed down. */
+export const ALL = 'ALL';
+export type CategoryFilter = Category | typeof ALL;
+export type TypeFilter = ProductType | typeof ALL;
 
 /** How the product grid is ordered. */
 export type SortMode = 'DEFAULT' | 'NAME' | 'STATUS';
@@ -32,7 +34,7 @@ export interface Product {
 export interface PantryItem {
   product: Product;
   status: StockStatus;
-  view: PantryView;
+  type: ProductType;
   category: Category;
   updatedAt: string;
 }
@@ -54,7 +56,7 @@ export interface PantryDetail extends Pantry {
 /** Partial update of an item; omitted fields are left untouched. */
 export interface ItemPatch {
   status?: StockStatus;
-  view?: PantryView;
+  type?: ProductType;
   category?: Category;
 }
 

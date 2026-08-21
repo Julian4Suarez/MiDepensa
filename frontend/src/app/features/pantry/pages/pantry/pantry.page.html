@@ -1,89 +1,60 @@
-<!--
-  ion-split-pane keeps the menu permanently visible from the "lg" breakpoint up
-  and collapses it into a swipeable drawer on smaller screens. That single
-  attribute is the whole responsive strategy for this page.
--->
-<ion-split-pane contentId="pantry-content" when="lg">
-  <ion-menu contentId="pantry-content" type="overlay">
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>{{ store.pantry()?.name ?? 'Pantry' }}</ion-title>
-      </ion-toolbar>
-    </ion-header>
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button routerLink="/" aria-label="New pantry">
+        <ion-icon slot="icon-only" name="home-outline" />
+      </ion-button>
+    </ion-buttons>
 
-    <ion-content>
-      <ion-list lines="none">
-        <ion-list-header>Views</ion-list-header>
+    <ion-title>{{ store.pantry()?.name ?? 'Pantry' }}</ion-title>
 
-        @for (view of views; track view) {
-          <ion-item
-            button
-            detail="false"
-            [class.selected]="store.view() === view"
-            (click)="selectView(view)"
-          >
-            <ion-icon slot="start" [name]="viewMeta[view].icon" aria-hidden="true" />
-            <ion-label>{{ viewMeta[view].label }}</ion-label>
-            @if (store.missingByView()[view] > 0) {
-              <ion-badge slot="end" color="danger">{{ store.missingByView()[view] }}</ion-badge>
-            }
-          </ion-item>
-        }
-      </ion-list>
+    <ion-buttons slot="end">
+      <ion-button
+        (click)="openSort()"
+        [attr.aria-label]="'Sort by ' + sortMeta[store.sort()].label"
+      >
+        <ion-icon slot="icon-only" name="swap-vertical-outline" />
+      </ion-button>
+      <ion-button (click)="openShoppingList()" aria-label="Shopping list">
+        <ion-icon slot="icon-only" name="cart-outline" />
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
 
-      <ion-list lines="none">
-        <ion-item button detail="false" routerLink="/">
-          <ion-icon slot="start" name="home-outline" aria-hidden="true" />
-          <ion-label>New pantry</ion-label>
-        </ion-item>
-      </ion-list>
-    </ion-content>
-  </ion-menu>
+  <!-- Two independent axes: how often you buy it, and which aisle it is in. -->
+  <app-filter-bar
+    label="Filter by type"
+    [options]="typeOptions"
+    [selected]="store.type()"
+    (selectedChange)="selectType($event)"
+  />
+  <app-filter-bar
+    class="secondary"
+    label="Filter by category"
+    [options]="categoryOptions()"
+    [selected]="store.category()"
+    (selectedChange)="selectCategory($event)"
+  />
+</ion-header>
 
-  <div class="ion-page" id="pantry-content">
-    <ion-header>
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-menu-button />
-        </ion-buttons>
-        <ion-title>{{ viewMeta[store.view()].label }}</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="openSort()" [attr.aria-label]="'Sort by ' + sortMeta[store.sort()].label">
-            <ion-icon slot="icon-only" name="swap-vertical-outline" />
-          </ion-button>
-          <ion-button (click)="openShoppingList()" aria-label="Shopping list">
-            <ion-icon slot="icon-only" name="cart-outline" />
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-
-      <app-category-filter-bar
-        [categories]="store.availableCategories()"
-        [selected]="store.category()"
-        (selectedChange)="store.category.set($event)"
-      />
-    </ion-header>
-
-    <ion-content>
-      @if (store.loading()) {
-        <div class="state"><ion-spinner name="crescent" /></div>
-      } @else if (store.error()) {
-        <div class="state"><p class="text-muted">{{ store.error() }}</p></div>
-      } @else if (store.visibleItems().length === 0) {
-        <div class="state">
-          <p class="text-muted">No products in this view yet.</p>
-        </div>
-      } @else {
-        <div class="grid">
-          @for (item of store.visibleItems(); track item.product.id) {
-            <app-product-card
-              [item]="item"
-              (statusToggled)="store.cycleStatus($event)"
-              (settingsOpened)="openSettings($event)"
-            />
-          }
-        </div>
+<ion-content>
+  @if (store.loading()) {
+    <div class="state"><ion-spinner name="crescent" /></div>
+  } @else if (store.error()) {
+    <div class="state"><p class="text-muted">{{ store.error() }}</p></div>
+  } @else if (store.visibleItems().length === 0) {
+    <div class="state">
+      <p class="text-muted">No products match these filters.</p>
+    </div>
+  } @else {
+    <div class="grid">
+      @for (item of store.visibleItems(); track item.product.id) {
+        <app-product-card
+          [item]="item"
+          (statusToggled)="store.cycleStatus($event)"
+          (settingsOpened)="openSettings($event)"
+        />
       }
-    </ion-content>
-  </div>
-</ion-split-pane>
+    </div>
+  }
+</ion-content>

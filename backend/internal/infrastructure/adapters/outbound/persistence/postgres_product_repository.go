@@ -10,7 +10,7 @@ import (
 	"midepensa/internal/domain/entities"
 )
 
-const productColumns = `p.id, p.code, p.name, p.image, p.default_category, p.default_view, p.sort_order`
+const productColumns = `p.id, p.code, p.name, p.image, p.default_category, p.default_type, p.sort_order`
 
 type postgresProductRepository struct {
 	pool *pgxpool.Pool
@@ -52,7 +52,7 @@ func scanProduct(row pgx.Row) (entities.Product, error) {
 		&product.Name,
 		&product.Image,
 		&product.DefaultCategory,
-		&product.DefaultView,
+		&product.DefaultType,
 		&product.SortOrder,
 	); err != nil {
 		return entities.Product{}, fmt.Errorf("persistence: scan product: %w", err)

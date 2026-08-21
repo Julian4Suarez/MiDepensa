@@ -1,17 +1,7 @@
-ion-menu {
-  --ion-background-color: var(--app-surface);
-  --border: 1px solid var(--ion-border-color);
-}
-
-ion-menu ion-item.selected {
-  --background: var(--app-status-ok-soft);
-  --color: var(--ion-color-primary-shade);
-  font-weight: 600;
-}
-
-ion-menu ion-item {
-  --border-radius: var(--app-radius-sm);
-  margin: 2px 10px;
+/* A hairline keeps the two axes visually separate: how often you buy it, and
+   which aisle it is in. */
+app-filter-bar.secondary {
+  border-top: 1px solid var(--ion-border-color);
 }
 
 /* auto-fill keeps the cards a comfortable size on any width, from a phone

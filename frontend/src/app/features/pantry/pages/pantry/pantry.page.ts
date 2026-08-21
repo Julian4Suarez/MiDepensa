@@ -1,21 +1,13 @@
-import { ChangeDetectionStrategy, Component, type OnInit, inject, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, type OnInit, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
   ActionSheetController,
-  IonBadge,
   IonButton,
   IonButtons,
   IonContent,
   IonHeader,
   IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonListHeader,
-  IonMenu,
-  IonMenuButton,
   IonSpinner,
-  IonSplitPane,
   IonTitle,
   IonToolbar,
   ModalController,
@@ -25,25 +17,42 @@ import {
   appsOutline,
   bookmarkOutline,
   cartOutline,
+  eggOutline,
+  ellipsisHorizontalOutline,
+  fileTrayStackedOutline,
+  fishOutline,
   homeOutline,
+  nutritionOutline,
+  sparklesOutline,
   starOutline,
   swapVerticalOutline,
+  wineOutline,
 } from 'ionicons/icons';
 
-import { CategoryFilterBarComponent } from '../../../../shared/components/category-filter-bar/category-filter-bar.component';
+import {
+  FilterBarComponent,
+  type FilterOption,
+} from '../../../../shared/components/filter-bar/filter-bar.component';
 import { ProductCardComponent } from '../../../../shared/components/product-card/product-card.component';
 import {
+  ALL_ICON,
+  CATEGORY_META,
   SORT_META,
   SORT_MODES,
-  VIEWS,
-  VIEW_META,
+  TYPES,
+  TYPE_META,
 } from '../../../../shared/models/pantry.meta';
-import type { PantryItem, PantryView } from '../../../../shared/models/pantry.model';
+import {
+  ALL,
+  type CategoryFilter,
+  type PantryItem,
+  type TypeFilter,
+} from '../../../../shared/models/pantry.model';
 import { ItemSettingsModalComponent } from '../../components/item-settings-modal/item-settings-modal.component';
 import { ShoppingListModalComponent } from '../../components/shopping-list-modal/shopping-list-modal.component';
 import { PantryStore } from '../../pantry.store';
 
-/** The pantry screen: side menu with views, category filter and product grid. */
+/** The pantry screen: two filter bars and the product grid. */
 @Component({
   selector: 'app-pantry',
   standalone: true,
@@ -51,23 +60,15 @@ import { PantryStore } from '../../pantry.store';
   // Provided here rather than in root so the state is discarded on navigation.
   providers: [PantryStore],
   imports: [
-    CategoryFilterBarComponent,
+    FilterBarComponent,
     ProductCardComponent,
     RouterLink,
-    IonBadge,
     IonButton,
     IonButtons,
     IonContent,
     IonHeader,
     IonIcon,
-    IonItem,
-    IonLabel,
-    IonList,
-    IonListHeader,
-    IonMenu,
-    IonMenuButton,
     IonSpinner,
-    IonSplitPane,
     IonTitle,
     IonToolbar,
   ],
@@ -79,17 +80,37 @@ export class PantryPage implements OnInit {
   private readonly modals = inject(ModalController);
   private readonly actionSheets = inject(ActionSheetController);
 
-  protected readonly views = VIEWS;
-  protected readonly viewMeta = VIEW_META;
   protected readonly sortMeta = SORT_META;
 
   /** Bound from the `:slug` route parameter by withComponentInputBinding. */
   readonly slug = input.required<string>();
 
+  private readonly allOption: FilterOption = { value: ALL, label: 'All', icon: ALL_ICON };
+
+  protected readonly typeOptions: FilterOption[] = [
+    this.allOption,
+    ...TYPES.map((type) => ({ value: type, ...TYPE_META[type] })),
+  ];
+
+  /** Rebuilt whenever the type filter changes the set of available categories. */
+  protected readonly categoryOptions = computed<FilterOption[]>(() => [
+    this.allOption,
+    ...this.store
+      .availableCategories()
+      .map((category) => ({ value: category, ...CATEGORY_META[category] })),
+  ]);
+
   constructor() {
     addIcons({
       starOutline,
       bookmarkOutline,
+      ellipsisHorizontalOutline,
+      nutritionOutline,
+      fishOutline,
+      eggOutline,
+      fileTrayStackedOutline,
+      wineOutline,
+      sparklesOutline,
       appsOutline,
       cartOutline,
       homeOutline,
@@ -101,9 +122,13 @@ export class PantryPage implements OnInit {
     void this.store.load(this.slug());
   }
 
-  protected selectView(view: PantryView): void {
-    this.store.view.set(view);
-    this.store.category.set('ALL');
+  // The filter bar is value-agnostic, so the page narrows the emitted string.
+  protected selectType(value: string): void {
+    this.store.selectType(value as TypeFilter);
+  }
+
+  protected selectCategory(value: string): void {
+    this.store.category.set(value as CategoryFilter);
   }
 
   protected async openSort(): Promise<void> {
@@ -139,7 +164,7 @@ export class PantryPage implements OnInit {
   protected async openShoppingList(): Promise<void> {
     const modal = await this.modals.create({
       component: ShoppingListModalComponent,
-      componentProps: { items: this.store.itemsInView() },
+      componentProps: { items: this.store.visibleItems() },
       breakpoints: [0, 0.9],
       initialBreakpoint: 0.9,
     });

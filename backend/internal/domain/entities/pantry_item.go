@@ -15,19 +15,19 @@ type PantryItem struct {
 	PantryID  uuid.UUID
 	Product   Product
 	Status    StockStatus
-	View      PantryView
+	Type      ProductType
 	Category  Category
 	UpdatedAt time.Time
 }
 
 // NewPantryItem creates the initial item for a freshly created pantry, taking
-// its category and view from the catalog defaults.
+// its category and type from the catalog defaults.
 func NewPantryItem(pantryID uuid.UUID, product Product) PantryItem {
 	return PantryItem{
 		PantryID:  pantryID,
 		Product:   product,
 		Status:    StatusOK,
-		View:      product.DefaultView,
+		Type:      product.DefaultType,
 		Category:  product.DefaultCategory,
 		UpdatedAt: time.Now().UTC(),
 	}
@@ -36,13 +36,13 @@ func NewPantryItem(pantryID uuid.UUID, product Product) PantryItem {
 // ItemPatch is a partial update of a pantry item; nil fields are left untouched.
 type ItemPatch struct {
 	Status   *StockStatus
-	View     *PantryView
+	Type     *ProductType
 	Category *Category
 }
 
 // IsEmpty reports whether the patch would change nothing.
 func (p ItemPatch) IsEmpty() bool {
-	return p.Status == nil && p.View == nil && p.Category == nil
+	return p.Status == nil && p.Type == nil && p.Category == nil
 }
 
 // Validate rejects patches carrying values outside the known enums.
@@ -50,7 +50,7 @@ func (p ItemPatch) Validate() error {
 	if p.Status != nil && !p.Status.IsValid() {
 		return ErrInvalidItemPatch
 	}
-	if p.View != nil && !p.View.IsValid() {
+	if p.Type != nil && !p.Type.IsValid() {
 		return ErrInvalidItemPatch
 	}
 	if p.Category != nil && !p.Category.IsValid() {
@@ -64,8 +64,8 @@ func (i *PantryItem) Apply(patch ItemPatch) {
 	if patch.Status != nil {
 		i.Status = *patch.Status
 	}
-	if patch.View != nil {
-		i.View = *patch.View
+	if patch.Type != nil {
+		i.Type = *patch.Type
 	}
 	if patch.Category != nil {
 		i.Category = *patch.Category

@@ -11,6 +11,6 @@ type Product struct {
 	// Image is the file name of the icon under frontend assets, e.g. "tomato.svg".
 	Image           string
 	DefaultCategory Category
-	DefaultView     PantryView
+	DefaultType     ProductType
 	SortOrder       int
 }

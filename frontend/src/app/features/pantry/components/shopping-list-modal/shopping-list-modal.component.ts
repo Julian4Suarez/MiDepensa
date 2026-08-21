@@ -40,7 +40,8 @@ export class ShoppingListModalComponent {
   private readonly toasts = inject(ToastController);
 
   /**
-   * Items of the current view, assigned through `componentProps`.
+   * The products currently visible on the pantry screen, assigned through
+   * `componentProps`, so the list matches whatever the filters show.
    *
    * A plain property, not `input()`: ModalController assigns componentProps
    * straight onto the instance, which would overwrite an InputSignal.

@@ -158,32 +158,37 @@ re-running.
 ```ts
 // Writable state — the only things that actually change.
 readonly items = signal<PantryItem[]>([]);
-readonly view = signal<PantryView>('PRIMARY');
-readonly category = signal<CategoryFilter>('ALL');
+readonly type = signal<TypeFilter>('ESSENTIAL');
+readonly category = signal<CategoryFilter>(ALL);
 readonly sort = signal<SortMode>('DEFAULT');
 
 // Derived state — recomputed automatically, cached until a dependency changes.
-readonly itemsInView = computed(() => this.items().filter((item) => item.view === this.view()));
+readonly itemsOfType = computed(() => {
+  const type = this.type();
+  return type === ALL ? this.items() : this.items().filter((item) => item.type === type);
+});
 
 readonly visibleItems = computed(() => {
   const category = this.category();
   const filtered =
-    category === 'ALL'
-      ? this.itemsInView()
-      : this.itemsInView().filter((item) => item.category === category);
+    category === ALL
+      ? this.itemsOfType()
+      : this.itemsOfType().filter((item) => item.category === category);
 
   return sortItems(filtered, this.sort());
 });
 
 readonly availableCategories = computed<Category[]>(() =>
-  CATEGORIES.filter((category) => this.itemsInView().some((item) => item.category === category)),
+  CATEGORIES.filter((category) => this.itemsOfType().some((item) => item.category === category)),
 );
 ```
 
-Tapping a category chip calls `store.category.set('FRUIT_VEG')`; picking a sort
-mode calls `store.sort.set('STATUS')`. That is the entire filtering and ordering
-feature: `visibleItems` recomputes, the grid re-renders, and
-`availableCategories` recomputes only if `itemsInView` actually changed.
+Tapping a chip calls `store.selectType('OTHERS')` or
+`store.category.set('FRUIT_VEG')`; picking a sort mode calls
+`store.sort.set('STATUS')`. That is the entire filtering and ordering feature:
+`visibleItems` recomputes, the grid re-renders, and `availableCategories`
+recomputes only if `itemsOfType` actually changed — which is what makes the
+category bar drop the aisles that have no products under the selected type.
 
 Compare with RxJS: no `BehaviorSubject`, no `combineLatest`, no `async` pipe, no
 unsubscribing.
@@ -257,7 +262,7 @@ Angular 17+ has built-in blocks — no `*ngIf`, no `*ngFor`, nothing to import.
 } @else if (store.error()) {
   <div class="state"><p class="text-muted">{{ store.error() }}</p></div>
 } @else if (store.visibleItems().length === 0) {
-  <div class="state"><p class="text-muted">No products in this view yet.</p></div>
+  <div class="state"><p class="text-muted">No products match these filters.</p></div>
 } @else {
   <div class="grid">
     @for (item of store.visibleItems(); track item.product.id) {
@@ -295,15 +300,17 @@ readonly statusToggled = output<PantryItem>();         // was @Output() … = ne
 | `ion-app`, `ion-router-outlet` | `app.component.ts` | Layout context and page transitions |
 | `ion-content` | every page | The scrollable area, with safe-area padding |
 | `ion-header`, `ion-toolbar`, `ion-title` | pantry page, modals | Top bar that stays put while content scrolls |
-| `ion-split-pane` | pantry page | Sidebar on desktop, drawer on mobile |
-| `ion-menu`, `ion-menu-button` | pantry page | The drawer itself and its hamburger |
-| `ion-list`, `ion-item`, `ion-label`, `ion-badge` | side menu | Menu entries with pending-item counters |
+| `ion-buttons` | toolbars | Groups icon buttons into the `start` / `end` slots |
 | `ion-input`, `ion-note` | home page | Text field with floating label, helper text |
 | `ion-button`, `ion-icon`, `ion-spinner` | everywhere | Buttons, icons, loading state |
 | `ion-segment`, `ion-segment-button` | settings modal | Three mutually exclusive options |
 | `ion-checkbox` | shopping list modal | The "include low stock" toggle |
 | `ModalController`, `ToastController` | pantry page, modals | Bottom sheets and transient messages |
 | `ActionSheetController` | pantry page | The "sort by" menu, built from an array of buttons |
+
+The filter chips are **not** `ion-chip`: they are plain `<button>` elements in
+`FilterBarComponent`, because a chip is not a control and cannot express a
+pressed state for a screen reader. `aria-pressed` on a button can.
 
 Two Ionic conventions that trip people up:
 

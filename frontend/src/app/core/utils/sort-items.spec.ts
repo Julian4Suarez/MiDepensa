@@ -5,7 +5,7 @@ function item(name: string, status: StockStatus): PantryItem {
   return {
     product: { id: name, code: name, name, image: `${name}.svg` },
     status,
-    view: 'PRIMARY',
+    type: 'ESSENTIAL',
     category: 'FRUIT_VEG',
     updatedAt: '2026-01-01T00:00:00Z',
   };
