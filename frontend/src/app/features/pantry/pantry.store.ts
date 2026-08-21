@@ -55,9 +55,16 @@ export class PantryStore {
     return sortItems(filtered, this.sort());
   });
 
-  /** Only the categories actually present under the current type get a chip. */
+  /**
+   * Only categories present under the current type get a chip, except for the
+   * active category, which stays visible while changing type.
+   */
   readonly availableCategories = computed<Category[]>(() =>
-    CATEGORIES.filter((category) => this.itemsOfType().some((item) => item.category === category)),
+    CATEGORIES.filter(
+      (category) =>
+        this.category() === category ||
+        this.itemsOfType().some((item) => item.category === category),
+    ),
   );
 
   // ── Commands ──────────────────────────────────────────────
@@ -78,10 +85,9 @@ export class PantryStore {
     }
   }
 
-  /** Narrowing by type can leave the category filter pointing at nothing. */
+  /** Changes the type without discarding the independently selected category. */
   selectType(type: TypeFilter): void {
     this.type.set(type);
-    this.category.set(ALL);
   }
 
   /** Advances an item to the next stock status. */

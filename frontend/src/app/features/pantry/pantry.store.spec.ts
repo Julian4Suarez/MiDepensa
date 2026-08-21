@@ -20,6 +20,7 @@ describe('PantryStore', () => {
     item('Tomatoes', 'ESSENTIAL', 'FRUIT_VEG'),
     item('Rice', 'ESSENTIAL', 'DRY_CANNED'),
     item('Wine', 'OTHERS', 'DRINKS'),
+    item('Dish soap', 'SECONDARY', 'HOME_CARE'),
   ];
 
   let api: jest.Mocked<Pick<PantryApiService, 'getPantry' | 'updateItem'>>;
@@ -60,7 +61,7 @@ describe('PantryStore', () => {
     expect(store.visibleItems().map((i) => i.product.name)).toEqual(['Wine']);
 
     store.selectType('ALL');
-    expect(store.visibleItems()).toHaveLength(3);
+    expect(store.visibleItems()).toHaveLength(4);
   });
 
   it('filters by the selected category inside the type', async () => {
@@ -77,14 +78,27 @@ describe('PantryStore', () => {
     expect(store.availableCategories()).toEqual(['FRUIT_VEG', 'DRY_CANNED']);
   });
 
-  it('resets the category when the type changes, so nothing filters to nothing', async () => {
+  it('keeps the selected category when the type changes', async () => {
     await loadPantry();
     store.category.set('DRY_CANNED');
 
     store.selectType('OTHERS');
 
-    expect(store.category()).toBe('ALL');
-    expect(store.visibleItems().map((i) => i.product.name)).toEqual(['Wine']);
+    expect(store.category()).toBe('DRY_CANNED');
+    expect(store.availableCategories()).toEqual(['DRY_CANNED', 'DRINKS']);
+    expect(store.visibleItems()).toEqual([]);
+  });
+
+  it('also keeps Home and Care selected and visible when the type changes', async () => {
+    await loadPantry();
+    store.selectType('SECONDARY');
+    store.category.set('HOME_CARE');
+
+    store.selectType('OTHERS');
+
+    expect(store.category()).toBe('HOME_CARE');
+    expect(store.availableCategories()).toEqual(['DRINKS', 'HOME_CARE']);
+    expect(store.visibleItems()).toEqual([]);
   });
 
   it('cycles the status and persists it', async () => {
