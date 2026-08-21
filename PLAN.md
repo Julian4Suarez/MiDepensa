@@ -11,7 +11,7 @@
 | Topic | Decision |
 | --- | --- |
 | Backend | **Go 1.26 + Gin + PostgreSQL** (mirrors `ductifact/backend`) |
-| Categories | **4**: Fresh / Pantry / Drinks / Home & Care |
+| Categories | **4**: Fresh / Pantry / Drinks / Home & Care — later replaced, see §11 |
 | Product images | **Local OpenMoji SVGs** (offline, no external requests) |
 | Item config | Catalog ships **default category + default view**; **one category per item** |
 | UI language | **English only** (no i18n layer) |
@@ -405,6 +405,7 @@ Things that changed while building, and why:
 
 | Change | Reason |
 | --- | --- |
+| Categories reworked into **6 supermarket aisles** (migration `000003`) | The original four did not survive contact with real use: `PANTRY` collided with the name of the app, and `FRESH` held 44% of the catalog. Now: Fruit & veg / Meat & fish / Dairy & eggs / Dry & canned / Drinks / Home & care. |
 | Catalog has **57** products, not ~50 | Four categories needed enough entries each to be useful. |
 | No `contracts/openapi/` folder | The API has six endpoints, fully described in `docs/GUIDE_ARCHITECTURE.md`. A hand-maintained spec with no code generation and no contract tests would have been dead weight. |
 | No Tailwind | Ionic CSS variables covered the whole design. One less thing to learn. |

@@ -50,14 +50,19 @@ func (v PantryView) IsValid() bool {
 	}
 }
 
-// Category groups products by what they are, used for quick filtering.
+// Category groups products by supermarket aisle, used for quick filtering and
+// for grouping the generated shopping list.
 type Category string
 
 const (
-	// CategoryFresh covers produce, dairy, meat, fish and bread.
-	CategoryFresh Category = "FRESH"
-	// CategoryPantry covers dry and canned goods.
-	CategoryPantry Category = "PANTRY"
+	// CategoryFruitVeg covers fresh produce.
+	CategoryFruitVeg Category = "FRUIT_VEG"
+	// CategoryMeatFish covers meat, poultry and fish.
+	CategoryMeatFish Category = "MEAT_FISH"
+	// CategoryDairyEggs covers milk, cheese, butter and eggs.
+	CategoryDairyEggs Category = "DAIRY_EGGS"
+	// CategoryDryCanned covers non-perishable food: dry, canned and packaged.
+	CategoryDryCanned Category = "DRY_CANNED"
 	// CategoryDrinks covers everything drinkable.
 	CategoryDrinks Category = "DRINKS"
 	// CategoryHomeCare covers cleaning and personal-care supplies.
@@ -65,12 +70,20 @@ const (
 )
 
 // Categories lists every category in display order.
-var Categories = []Category{CategoryFresh, CategoryPantry, CategoryDrinks, CategoryHomeCare}
+var Categories = []Category{
+	CategoryFruitVeg,
+	CategoryMeatFish,
+	CategoryDairyEggs,
+	CategoryDryCanned,
+	CategoryDrinks,
+	CategoryHomeCare,
+}
 
 // IsValid reports whether the category is one of the known values.
 func (c Category) IsValid() bool {
 	switch c {
-	case CategoryFresh, CategoryPantry, CategoryDrinks, CategoryHomeCare:
+	case CategoryFruitVeg, CategoryMeatFish, CategoryDairyEggs,
+		CategoryDryCanned, CategoryDrinks, CategoryHomeCare:
 		return true
 	default:
 		return false

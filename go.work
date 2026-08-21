@@ -1,0 +1,6 @@
+// Declares the Go module of this repository so the language server resolves it
+// correctly when the editor is rooted at the parent directory, which otherwise
+// reports spurious "expected declaration, found 'package'" errors.
+go 1.26.0
+
+use ./backend

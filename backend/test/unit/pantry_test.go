@@ -29,7 +29,7 @@ func TestNewPantryItem_TakesCategoryAndViewFromCatalogDefaults(t *testing.T) {
 	product := entities.Product{
 		ID:              uuid.New(),
 		Code:            "tomato",
-		DefaultCategory: entities.CategoryFresh,
+		DefaultCategory: entities.CategoryFruitVeg,
 		DefaultView:     entities.ViewPrimary,
 	}
 	pantryID := uuid.New()
@@ -38,7 +38,7 @@ func TestNewPantryItem_TakesCategoryAndViewFromCatalogDefaults(t *testing.T) {
 
 	assert.Equal(t, pantryID, item.PantryID)
 	assert.Equal(t, entities.StatusOK, item.Status)
-	assert.Equal(t, entities.CategoryFresh, item.Category)
+	assert.Equal(t, entities.CategoryFruitVeg, item.Category)
 	assert.Equal(t, entities.ViewPrimary, item.View)
 }
 
@@ -56,7 +56,7 @@ func TestItemPatch_Apply_OnlyChangesProvidedFields(t *testing.T) {
 	item := entities.PantryItem{
 		Status:   entities.StatusOK,
 		View:     entities.ViewPrimary,
-		Category: entities.CategoryFresh,
+		Category: entities.CategoryFruitVeg,
 	}
 	status := entities.StatusOut
 
@@ -64,7 +64,7 @@ func TestItemPatch_Apply_OnlyChangesProvidedFields(t *testing.T) {
 
 	assert.Equal(t, entities.StatusOut, item.Status)
 	assert.Equal(t, entities.ViewPrimary, item.View)
-	assert.Equal(t, entities.CategoryFresh, item.Category)
+	assert.Equal(t, entities.CategoryFruitVeg, item.Category)
 }
 
 func TestItemPatch_IsEmpty_ReportsWhetherAnythingWouldChange(t *testing.T) {

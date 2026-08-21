@@ -79,4 +79,8 @@
   --app-status-out-soft: #f6e3e0;
   --app-status-low-soft: #f8eeda;
   --app-status-ok-soft: #e4eee4;
+
+  /* Even lighter tint for the whole card of an out-of-stock product; it must
+     stay behind --app-status-out-soft so the pill remains readable. */
+  --app-status-out-surface: #f9f1f0;
 }

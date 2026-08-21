@@ -13,12 +13,13 @@
     </section>
 
     <section class="create" aria-labelledby="create-title">
-      <h2 id="create-title">Create a pantry</h2>
+      <h2 id="create-title">Open a pantry</h2>
       <p class="text-muted">
-        No sign-up. Pick a name, keep the link, and open it from any device.
+        No sign-up. Pick a name and keep the link. If a pantry with that name already exists, you
+        go straight to it.
       </p>
 
-      <form (ngSubmit)="create()">
+      <form (ngSubmit)="openPantry()">
         <ion-input
           label="Pantry name"
           labelPlacement="stacked"
@@ -43,7 +44,7 @@
           @if (submitting()) {
             <ion-spinner name="crescent" />
           } @else {
-            Create pantry
+            Create or enter
           }
         </ion-button>
       </form>

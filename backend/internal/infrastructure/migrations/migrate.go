@@ -1,4 +1,3 @@
-package migrations
 // Package migrations applies the embedded SQL schema at startup.
 //
 // The .sql files are compiled into the binary, so the container image needs no

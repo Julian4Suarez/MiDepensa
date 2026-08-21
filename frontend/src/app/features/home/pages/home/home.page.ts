@@ -41,7 +41,13 @@ export class HomePage {
     addIcons({ basketOutline });
   }
 
-  protected async create(): Promise<void> {
+  /**
+   * Creates the pantry, or opens it when it already exists.
+   *
+   * A 409 means the slug is taken, and since the frontend derives the slug with
+   * the same rules as the API, that pantry is exactly the one the user asked for.
+   */
+  protected async openPantry(): Promise<void> {
     if (!this.canSubmit()) {
       return;
     }
@@ -52,11 +58,11 @@ export class HomePage {
       const pantry = await firstValueFrom(this.api.createPantry(this.name()));
       await this.router.navigate(['/pantries', pantry.slug]);
     } catch (error: unknown) {
-      this.error.set(
-        (error as { status?: number }).status === 409
-          ? 'That name is taken. Try adding a surname or a number.'
-          : 'The pantry could not be created. Is the API running?',
-      );
+      if ((error as { status?: number }).status === 409) {
+        await this.router.navigate(['/pantries', this.slug()]);
+        return;
+      }
+      this.error.set('The pantry could not be opened. Is the API running?');
     } finally {
       this.submitting.set(false);
     }

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, type OnInit, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
+  ActionSheetController,
   IonBadge,
   IonButton,
   IonButtons,
@@ -26,11 +27,17 @@ import {
   cartOutline,
   homeOutline,
   starOutline,
+  swapVerticalOutline,
 } from 'ionicons/icons';
 
 import { CategoryFilterBarComponent } from '../../../../shared/components/category-filter-bar/category-filter-bar.component';
 import { ProductCardComponent } from '../../../../shared/components/product-card/product-card.component';
-import { VIEWS, VIEW_META } from '../../../../shared/models/pantry.meta';
+import {
+  SORT_META,
+  SORT_MODES,
+  VIEWS,
+  VIEW_META,
+} from '../../../../shared/models/pantry.meta';
 import type { PantryItem, PantryView } from '../../../../shared/models/pantry.model';
 import { ItemSettingsModalComponent } from '../../components/item-settings-modal/item-settings-modal.component';
 import { ShoppingListModalComponent } from '../../components/shopping-list-modal/shopping-list-modal.component';
@@ -70,15 +77,24 @@ import { PantryStore } from '../../pantry.store';
 export class PantryPage implements OnInit {
   protected readonly store = inject(PantryStore);
   private readonly modals = inject(ModalController);
+  private readonly actionSheets = inject(ActionSheetController);
 
   protected readonly views = VIEWS;
   protected readonly viewMeta = VIEW_META;
+  protected readonly sortMeta = SORT_META;
 
   /** Bound from the `:slug` route parameter by withComponentInputBinding. */
   readonly slug = input.required<string>();
 
   constructor() {
-    addIcons({ starOutline, bookmarkOutline, appsOutline, cartOutline, homeOutline });
+    addIcons({
+      starOutline,
+      bookmarkOutline,
+      appsOutline,
+      cartOutline,
+      homeOutline,
+      swapVerticalOutline,
+    });
   }
 
   ngOnInit(): void {
@@ -88,6 +104,21 @@ export class PantryPage implements OnInit {
   protected selectView(view: PantryView): void {
     this.store.view.set(view);
     this.store.category.set('ALL');
+  }
+
+  protected async openSort(): Promise<void> {
+    const sheet = await this.actionSheets.create({
+      header: 'Sort by',
+      buttons: [
+        ...SORT_MODES.map((mode) => ({
+          text: SORT_META[mode].label,
+          role: this.store.sort() === mode ? 'selected' : undefined,
+          handler: () => this.store.sort.set(mode),
+        })),
+        { text: 'Cancel', role: 'cancel' },
+      ],
+    });
+    await sheet.present();
   }
 
   protected async openSettings(item: PantryItem): Promise<void> {

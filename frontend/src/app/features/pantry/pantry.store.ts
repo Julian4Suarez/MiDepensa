@@ -2,6 +2,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { PantryApiService } from '../../core/services/pantry-api.service';
+import { sortItems } from '../../core/utils/sort-items';
 import { CATEGORIES, NEXT_STATUS } from '../../shared/models/pantry.meta';
 import type {
   Category,
@@ -10,6 +11,7 @@ import type {
   Pantry,
   PantryItem,
   PantryView,
+  SortMode,
 } from '../../shared/models/pantry.model';
 
 /**
@@ -28,6 +30,7 @@ export class PantryStore {
   readonly items = signal<PantryItem[]>([]);
   readonly view = signal<PantryView>('PRIMARY');
   readonly category = signal<CategoryFilter>('ALL');
+  readonly sort = signal<SortMode>('DEFAULT');
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
 
@@ -36,12 +39,15 @@ export class PantryStore {
   /** Items filed under the selected view, ignoring the category filter. */
   readonly itemsInView = computed(() => this.items().filter((item) => item.view === this.view()));
 
-  /** Items shown in the grid: selected view, then selected category. */
+  /** Items shown in the grid: selected view, then category, then sort order. */
   readonly visibleItems = computed(() => {
     const category = this.category();
-    return category === 'ALL'
-      ? this.itemsInView()
-      : this.itemsInView().filter((item) => item.category === category);
+    const filtered =
+      category === 'ALL'
+        ? this.itemsInView()
+        : this.itemsInView().filter((item) => item.category === category);
+
+    return sortItems(filtered, this.sort());
   });
 
   /** Only the categories actually present in the current view get a chip. */

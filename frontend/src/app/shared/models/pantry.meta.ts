@@ -1,11 +1,23 @@
-import type { Category, PantryView, StockStatus } from './pantry.model';
+import type { Category, PantryView, SortMode, StockStatus } from './pantry.model';
 
-/** Display order and labelling of the four product categories. */
-export const CATEGORIES: readonly Category[] = ['FRESH', 'PANTRY', 'DRINKS', 'HOME_CARE'];
+/**
+ * Display order of the six categories. They follow the order in which you walk
+ * a supermarket, so the generated shopping list matches the route you take.
+ */
+export const CATEGORIES: readonly Category[] = [
+  'FRUIT_VEG',
+  'MEAT_FISH',
+  'DAIRY_EGGS',
+  'DRY_CANNED',
+  'DRINKS',
+  'HOME_CARE',
+];
 
 export const CATEGORY_META: Record<Category, { label: string; icon: string }> = {
-  FRESH: { label: 'Fresh', icon: 'leaf-outline' },
-  PANTRY: { label: 'Pantry', icon: 'file-tray-stacked-outline' },
+  FRUIT_VEG: { label: 'Fruit & veg', icon: 'nutrition-outline' },
+  MEAT_FISH: { label: 'Meat & fish', icon: 'fish-outline' },
+  DAIRY_EGGS: { label: 'Dairy & eggs', icon: 'egg-outline' },
+  DRY_CANNED: { label: 'Dry & canned', icon: 'file-tray-stacked-outline' },
   DRINKS: { label: 'Drinks', icon: 'wine-outline' },
   HOME_CARE: { label: 'Home & care', icon: 'sparkles-outline' },
 };
@@ -33,4 +45,13 @@ export const NEXT_STATUS: Record<StockStatus, StockStatus> = {
   OK: 'LOW',
   LOW: 'OUT',
   OUT: 'OK',
+};
+
+/** Sort options offered by the toolbar, in the order they are listed. */
+export const SORT_MODES: readonly SortMode[] = ['DEFAULT', 'NAME', 'STATUS'];
+
+export const SORT_META: Record<SortMode, { label: string }> = {
+  DEFAULT: { label: 'Catalog order' },
+  NAME: { label: 'Name (A–Z)' },
+  STATUS: { label: 'Stock level' },
 };

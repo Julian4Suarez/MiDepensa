@@ -12,6 +12,7 @@
 
 .card[data-status='OUT'] {
   border-color: var(--ion-color-danger);
+  background: var(--app-status-out-surface);
 }
 
 .card[data-status='LOW'] {

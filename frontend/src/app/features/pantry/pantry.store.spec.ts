@@ -17,8 +17,8 @@ function item(name: string, view: PantryView, category: Category): PantryItem {
 
 describe('PantryStore', () => {
   const items = [
-    item('Tomatoes', 'PRIMARY', 'FRESH'),
-    item('Rice', 'PRIMARY', 'PANTRY'),
+    item('Tomatoes', 'PRIMARY', 'FRUIT_VEG'),
+    item('Rice', 'PRIMARY', 'DRY_CANNED'),
     item('Wine', 'OTHER', 'DRINKS'),
   ];
 
@@ -63,7 +63,7 @@ describe('PantryStore', () => {
   it('filters by the selected category inside the view', async () => {
     await loadPantry();
 
-    store.category.set('PANTRY');
+    store.category.set('DRY_CANNED');
 
     expect(store.visibleItems().map((i) => i.product.name)).toEqual(['Rice']);
   });
@@ -71,7 +71,7 @@ describe('PantryStore', () => {
   it('only offers chips for categories present in the view', async () => {
     await loadPantry();
 
-    expect(store.availableCategories()).toEqual(['FRESH', 'PANTRY']);
+    expect(store.availableCategories()).toEqual(['FRUIT_VEG', 'DRY_CANNED']);
   });
 
   it('cycles the status and persists it', async () => {

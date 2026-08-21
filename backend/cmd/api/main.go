@@ -1,4 +1,3 @@
-package main
 // Command api is the MiDepensa HTTP service.
 package main
 

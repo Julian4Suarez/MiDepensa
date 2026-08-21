@@ -1,4 +1,3 @@
-package valueobjects
 // Package valueobjects holds immutable, self-validating domain values.
 package valueobjects
 

@@ -160,15 +160,19 @@ re-running.
 readonly items = signal<PantryItem[]>([]);
 readonly view = signal<PantryView>('PRIMARY');
 readonly category = signal<CategoryFilter>('ALL');
+readonly sort = signal<SortMode>('DEFAULT');
 
 // Derived state — recomputed automatically, cached until a dependency changes.
 readonly itemsInView = computed(() => this.items().filter((item) => item.view === this.view()));
 
 readonly visibleItems = computed(() => {
   const category = this.category();
-  return category === 'ALL'
-    ? this.itemsInView()
-    : this.itemsInView().filter((item) => item.category === category);
+  const filtered =
+    category === 'ALL'
+      ? this.itemsInView()
+      : this.itemsInView().filter((item) => item.category === category);
+
+  return sortItems(filtered, this.sort());
 });
 
 readonly availableCategories = computed<Category[]>(() =>
@@ -176,8 +180,9 @@ readonly availableCategories = computed<Category[]>(() =>
 );
 ```
 
-Tapping a category chip calls `store.category.set('FRESH')`. That is the entire
-filtering feature: `visibleItems` recomputes, the grid re-renders, and
+Tapping a category chip calls `store.category.set('FRUIT_VEG')`; picking a sort
+mode calls `store.sort.set('STATUS')`. That is the entire filtering and ordering
+feature: `visibleItems` recomputes, the grid re-renders, and
 `availableCategories` recomputes only if `itemsInView` actually changed.
 
 Compare with RxJS: no `BehaviorSubject`, no `combineLatest`, no `async` pipe, no
@@ -298,6 +303,7 @@ readonly statusToggled = output<PantryItem>();         // was @Output() … = ne
 | `ion-segment`, `ion-segment-button` | settings modal | Three mutually exclusive options |
 | `ion-checkbox` | shopping list modal | The "include low stock" toggle |
 | `ModalController`, `ToastController` | pantry page, modals | Bottom sheets and transient messages |
+| `ActionSheetController` | pantry page | The "sort by" menu, built from an array of buttons |
 
 Two Ionic conventions that trip people up:
 
@@ -427,7 +433,8 @@ App-specific tokens live alongside them:
 ```scss
 --app-radius: 16px;
 --app-shadow: 0 1px 2px rgba(51, 55, 47, 0.04), 0 8px 24px rgba(51, 55, 47, 0.05);
---app-status-out-soft: #f6e3e0;
+--app-status-out-soft: #f6e3e0;      /* behind the status pill */
+--app-status-out-surface: #f9f1f0;   /* the whole card, lighter so the pill still reads */
 ```
 
 The status pill then needs no logic at all — just an attribute selector:
@@ -611,11 +618,12 @@ Two things will need attention:
 
 Small, useful exercises on this codebase:
 
-- **Add a product.** One row in `000002_seed_catalog.up.sql`, one line in
+- **Add a product.** One row in a new migration under
+  `backend/internal/infrastructure/migrations/`, one line in
   `frontend/scripts/fetch-product-icons.sh`.
-- **Add a fifth category.** Extend the Go `Category` enum and its `CHECK`
-  constraint, then `CATEGORIES` and `CATEGORY_META`. The chip bar and the
-  shopping list pick it up with no other change.
+- **Add a category.** Extend the Go `Category` enum and the `CHECK` constraints
+  in a new migration, then `CATEGORIES` and `CATEGORY_META`. The chip bar and
+  the shopping list pick it up with no other change.
 - **Add a "mark everything as enough" button.** A new method on `PantryStore`
   and a bulk endpoint on the backend.
 - **Add dark mode.** Import `@ionic/angular/css/palettes/dark.system.css` and

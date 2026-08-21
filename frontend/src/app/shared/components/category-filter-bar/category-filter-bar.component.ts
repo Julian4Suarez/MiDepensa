@@ -3,8 +3,10 @@ import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   appsOutline,
+  eggOutline,
   fileTrayStackedOutline,
-  leafOutline,
+  fishOutline,
+  nutritionOutline,
   sparklesOutline,
   wineOutline,
 } from 'ionicons/icons';
@@ -32,6 +34,14 @@ export class CategoryFilterBarComponent {
   protected readonly meta = CATEGORY_META;
 
   constructor() {
-    addIcons({ leafOutline, fileTrayStackedOutline, wineOutline, sparklesOutline, appsOutline });
+    addIcons({
+      nutritionOutline,
+      fishOutline,
+      eggOutline,
+      fileTrayStackedOutline,
+      wineOutline,
+      sparklesOutline,
+      appsOutline,
+    });
   }
 }

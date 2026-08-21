@@ -10,18 +10,23 @@ read-only and seeded by a migration.
 
 ```
 Pantry 1 ──── * PantryItem * ──── 1 Product
-"familia-suarez"   OUT / PRIMARY / FRESH    "tomato"
+"familia-suarez"   OUT / PRIMARY / FRUIT_VEG   "tomato"
 ```
 
 | Enum | Values |
 | --- | --- |
 | `StockStatus` | `OUT` (red), `LOW` (amber), `OK` (green) |
 | `PantryView` | `PRIMARY`, `SECONDARY`, `OTHER` |
-| `Category` | `FRESH`, `PANTRY`, `DRINKS`, `HOME_CARE` |
+| `Category` | `FRUIT_VEG`, `MEAT_FISH`, `DAIRY_EGGS`, `DRY_CANNED`, `DRINKS`, `HOME_CARE` |
 
-Views encode *priority* (how often you check the product); categories encode
-*what the product is*. Keeping the two axes separate is why four categories are
-enough.
+Views encode *priority* (how often you check the product); categories mirror
+**supermarket aisles**, because the generated shopping list is grouped by
+category and should follow the route you walk through the shop.
+
+The first version used four categories (`FRESH`, `PANTRY`, `DRINKS`,
+`HOME_CARE`). It was replaced in migration `000003` because `PANTRY` collided
+with the name of the app and `FRESH` held 44% of the catalog, which makes it
+useless as a filter.
 
 ## Slugs
 
@@ -116,7 +121,9 @@ Base path `/v1`.
 | `PATCH` | `/v1/pantries/{slug}/items/{productId}` | `{ status?, view?, category? }` |
 
 Creating a pantry inserts the pantry row and all 57 item rows in one
-transaction; a slug collision rolls the whole thing back and returns `409`.
+transaction; a slug collision rolls the whole thing back and returns `409`. The
+home page turns that `409` into navigation: the pantry the user asked for
+already exists, so it opens it instead of reporting an error.
 
 The `PATCH` is a real partial update. `nil` fields become SQL `NULL` and the
 statement uses `COALESCE($3, status)`, so omitted fields keep their value. A CTE

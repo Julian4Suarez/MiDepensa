@@ -48,6 +48,9 @@
         </ion-buttons>
         <ion-title>{{ viewMeta[store.view()].label }}</ion-title>
         <ion-buttons slot="end">
+          <ion-button (click)="openSort()" [attr.aria-label]="'Sort by ' + sortMeta[store.sort()].label">
+            <ion-icon slot="icon-only" name="swap-vertical-outline" />
+          </ion-button>
           <ion-button (click)="openShoppingList()" aria-label="Shopping list">
             <ion-icon slot="icon-only" name="cart-outline" />
           </ion-button>

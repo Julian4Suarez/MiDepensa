@@ -13,27 +13,29 @@ function item(name: string, status: StockStatus, category: Category): PantryItem
 
 describe('buildShoppingList', () => {
   const items = [
-    item('Tomatoes', 'OUT', 'FRESH'),
-    item('Milk', 'LOW', 'FRESH'),
-    item('Rice', 'OK', 'PANTRY'),
-    item('Olive oil', 'OUT', 'PANTRY'),
+    item('Tomatoes', 'OUT', 'FRUIT_VEG'),
+    item('Milk', 'LOW', 'DAIRY_EGGS'),
+    item('Rice', 'OK', 'DRY_CANNED'),
+    item('Olive oil', 'OUT', 'DRY_CANNED'),
     item('Dish soap', 'LOW', 'HOME_CARE'),
   ];
 
   it('lists only out-of-stock products, grouped by category', () => {
     expect(buildShoppingList(items, false)).toBe(
-      ['Fresh', '- Tomatoes', '', 'Pantry', '- Olive oil'].join('\n'),
+      ['Fruit & veg', '- Tomatoes', '', 'Dry & canned', '- Olive oil'].join('\n'),
     );
   });
 
   it('adds running-low products marked as low when requested', () => {
     expect(buildShoppingList(items, true)).toBe(
       [
-        'Fresh',
+        'Fruit & veg',
         '- Tomatoes',
+        '',
+        'Dairy & eggs',
         '- Milk (low)',
         '',
-        'Pantry',
+        'Dry & canned',
         '- Olive oil',
         '',
         'Home & care',
@@ -43,6 +45,6 @@ describe('buildShoppingList', () => {
   });
 
   it('returns an empty string when nothing needs buying', () => {
-    expect(buildShoppingList([item('Rice', 'OK', 'PANTRY')], true)).toBe('');
+    expect(buildShoppingList([item('Rice', 'OK', 'DRY_CANNED')], true)).toBe('');
   });
 });

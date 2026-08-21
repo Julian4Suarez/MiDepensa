@@ -1,4 +1,3 @@
-package helpers
 // Package helpers translates domain errors into HTTP responses.
 package helpers
 

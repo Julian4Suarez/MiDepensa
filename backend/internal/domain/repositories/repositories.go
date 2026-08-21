@@ -1,4 +1,3 @@
-package repositories
 // Package repositories declares the outbound ports for persistence.
 package repositories
 

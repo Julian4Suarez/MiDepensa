@@ -4,11 +4,20 @@ export type StockStatus = 'OUT' | 'LOW' | 'OK';
 /** Section of the pantry a product is filed under. */
 export type PantryView = 'PRIMARY' | 'SECONDARY' | 'OTHER';
 
-/** Product group used for quick filtering. */
-export type Category = 'FRESH' | 'PANTRY' | 'DRINKS' | 'HOME_CARE';
+/** Product group used for quick filtering, mirroring supermarket aisles. */
+export type Category =
+  | 'FRUIT_VEG'
+  | 'MEAT_FISH'
+  | 'DAIRY_EGGS'
+  | 'DRY_CANNED'
+  | 'DRINKS'
+  | 'HOME_CARE';
 
 /** Sentinel used by the filter bar when no category is selected. */
 export type CategoryFilter = Category | 'ALL';
+
+/** How the product grid is ordered. */
+export type SortMode = 'DEFAULT' | 'NAME' | 'STATUS';
 
 /** A catalog entry. */
 export interface Product {
