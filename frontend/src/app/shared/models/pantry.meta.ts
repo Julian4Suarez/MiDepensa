@@ -10,25 +10,33 @@ import type {
 export const ALL_ICON = 'apps-outline';
 
 /**
- * Display order of the six categories. They follow the order in which you walk
+ * Display order of the ten categories. They follow the order in which you walk
  * a supermarket, so the generated shopping list matches the route you take.
  */
 export const CATEGORIES: readonly Category[] = [
-  'FRUIT_VEG',
+  'FRUIT',
+  'VEGETABLES',
   'MEAT_FISH',
   'DAIRY_EGGS',
-  'DRY_CANNED',
+  'BAKERY_BREAKFAST_SNACKS',
+  'PASTA_RICE_LEGUMES',
+  'COOKING_CONDIMENTS',
   'DRINKS',
-  'HOME_CARE',
+  'HOUSEHOLD_CLEANING',
+  'PERSONAL_CARE',
 ];
 
 export const CATEGORY_META: Record<Category, { label: string; icon: string }> = {
-  FRUIT_VEG: { label: 'Fruit & veg', icon: 'nutrition-outline' },
+  FRUIT: { label: 'Fruit', icon: 'nutrition-outline' },
+  VEGETABLES: { label: 'Vegetables', icon: 'leaf-outline' },
   MEAT_FISH: { label: 'Meat & fish', icon: 'fish-outline' },
   DAIRY_EGGS: { label: 'Dairy & eggs', icon: 'egg-outline' },
-  DRY_CANNED: { label: 'Dry & canned', icon: 'file-tray-stacked-outline' },
+  BAKERY_BREAKFAST_SNACKS: { label: 'Bakery, breakfast & snacks', icon: 'cafe-outline' },
+  PASTA_RICE_LEGUMES: { label: 'Pasta, rice & legumes', icon: 'restaurant-outline' },
+  COOKING_CONDIMENTS: { label: 'Cooking essentials & condiments', icon: 'flame-outline' },
   DRINKS: { label: 'Drinks', icon: 'wine-outline' },
-  HOME_CARE: { label: 'Home & care', icon: 'sparkles-outline' },
+  HOUSEHOLD_CLEANING: { label: 'Household & cleaning', icon: 'construct-outline' },
+  PERSONAL_CARE: { label: 'Personal care', icon: 'person-outline' },
 };
 
 /** Display order and labelling of the two active product types. */

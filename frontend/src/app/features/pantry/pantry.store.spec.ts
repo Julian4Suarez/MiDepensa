@@ -23,10 +23,10 @@ function item(
 
 describe('PantryStore', () => {
   const items = [
-    item('Tomatoes', 'ESSENTIAL', 'FRUIT_VEG'),
-    item('Rice', 'ESSENTIAL', 'DRY_CANNED', 'DISCARDED'),
+    item('Tomatoes', 'ESSENTIAL', 'VEGETABLES'),
+    item('Rice', 'ESSENTIAL', 'PASTA_RICE_LEGUMES', 'DISCARDED'),
     item('Wine', 'SECONDARY', 'DRINKS', 'ARCHIVED'),
-    item('Dish soap', 'SECONDARY', 'HOME_CARE', 'IN_CART'),
+    item('Dish soap', 'SECONDARY', 'HOUSEHOLD_CLEANING', 'IN_CART'),
   ];
 
   let api: jest.Mocked<
@@ -89,7 +89,7 @@ describe('PantryStore', () => {
     await loadPantry();
     store.status.set('ALL');
 
-    store.category.set('DRY_CANNED');
+    store.category.set('PASTA_RICE_LEGUMES');
 
     expect(store.visibleItems().map((i) => i.product.name)).toEqual(['Rice']);
   });
@@ -127,29 +127,29 @@ describe('PantryStore', () => {
   it('only offers chips for categories present under the current type', async () => {
     await loadPantry();
 
-    expect(store.availableCategories()).toEqual(['FRUIT_VEG', 'DRY_CANNED']);
+    expect(store.availableCategories()).toEqual(['VEGETABLES', 'PASTA_RICE_LEGUMES']);
   });
 
   it('keeps the selected category when the type changes', async () => {
     await loadPantry();
-    store.category.set('DRY_CANNED');
+    store.category.set('PASTA_RICE_LEGUMES');
 
     store.selectType('ARCHIVED');
 
-    expect(store.category()).toBe('DRY_CANNED');
-    expect(store.availableCategories()).toEqual(['DRY_CANNED', 'DRINKS']);
+    expect(store.category()).toBe('PASTA_RICE_LEGUMES');
+    expect(store.availableCategories()).toEqual(['PASTA_RICE_LEGUMES', 'DRINKS']);
     expect(store.visibleItems()).toEqual([]);
   });
 
   it('also keeps Home and Care selected and visible when the type changes', async () => {
     await loadPantry();
     store.selectType('SECONDARY');
-    store.category.set('HOME_CARE');
+    store.category.set('HOUSEHOLD_CLEANING');
 
     store.selectType('ARCHIVED');
 
-    expect(store.category()).toBe('HOME_CARE');
-    expect(store.availableCategories()).toEqual(['DRINKS', 'HOME_CARE']);
+    expect(store.category()).toBe('HOUSEHOLD_CLEANING');
+    expect(store.availableCategories()).toEqual(['DRINKS', 'HOUSEHOLD_CLEANING']);
     expect(store.visibleItems()).toEqual([]);
   });
 

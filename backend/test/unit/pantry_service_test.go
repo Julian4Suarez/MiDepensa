@@ -54,8 +54,8 @@ func (m *mockProductRepository) List(ctx context.Context) ([]entities.Product, e
 
 func catalogOfTwo() []entities.Product {
 	return []entities.Product{
-		{ID: uuid.New(), Code: "tomato", DefaultCategory: entities.CategoryFruitVeg, DefaultType: entities.TypeEssential},
-		{ID: uuid.New(), Code: "rice", DefaultCategory: entities.CategoryDryCanned, DefaultType: entities.TypeSecondary},
+		{ID: uuid.New(), Code: "tomato", DefaultCategory: entities.CategoryVegetables, DefaultType: entities.TypeEssential},
+		{ID: uuid.New(), Code: "rice", DefaultCategory: entities.CategoryPastaRiceLegumes, DefaultType: entities.TypeSecondary},
 	}
 }
 

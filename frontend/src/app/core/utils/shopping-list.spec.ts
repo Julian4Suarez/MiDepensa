@@ -14,20 +14,26 @@ function item(name: string, status: ItemStatus, category: Category): PantryItem 
 
 describe('buildShoppingList', () => {
   const items = [
-    item('Tomatoes', 'IN_CART', 'FRUIT_VEG'),
+    item('Tomatoes', 'IN_CART', 'VEGETABLES'),
     item('Milk', 'PENDING', 'DAIRY_EGGS'),
-    item('Rice', 'DISCARDED', 'DRY_CANNED'),
-    item('Olive oil', 'IN_CART', 'DRY_CANNED'),
+    item('Rice', 'DISCARDED', 'PASTA_RICE_LEGUMES'),
+    item('Olive oil', 'IN_CART', 'COOKING_CONDIMENTS'),
   ];
 
   it('lists only products in the cart, grouped by category', () => {
     expect(buildShoppingList(items)).toBe(
-      ['Fruit & veg', '- Tomatoes', '', 'Dry & canned', '- Olive oil'].join('\n'),
+      [
+        'Vegetables',
+        '- Tomatoes',
+        '',
+        'Cooking essentials & condiments',
+        '- Olive oil',
+      ].join('\n'),
     );
   });
 
   it('returns an empty string when the cart is empty', () => {
-    expect(buildShoppingList([item('Rice', 'DISCARDED', 'DRY_CANNED')])).toBe('');
+    expect(buildShoppingList([item('Rice', 'DISCARDED', 'PASTA_RICE_LEGUMES')])).toBe('');
   });
 
   it('lists selected variants instead of the general product', () => {

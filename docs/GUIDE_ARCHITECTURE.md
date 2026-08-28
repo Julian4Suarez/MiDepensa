@@ -10,7 +10,7 @@ is global, read-only and seeded by a migration.
 
 ```
 Pantry 1 ──── * PantryItem * ──── 1 Product
-"familia-suarez"   PENDING / ESSENTIAL / FRUIT_VEG   "tomato"
+"familia-suarez"   PENDING / ESSENTIAL / VEGETABLES   "tomato"
                                       │
                                       └── * ProductVariant
 ```
@@ -19,7 +19,7 @@ Pantry 1 ──── * PantryItem * ──── 1 Product
 | --- | --- |
 | `ItemStatus` | `DISCARDED`, `PENDING`, `IN_CART`, `ARCHIVED` |
 | `ProductType` | `ESSENTIAL`, `SECONDARY` |
-| `Category` | `FRUIT_VEG`, `MEAT_FISH`, `DAIRY_EGGS`, `DRY_CANNED`, `DRINKS`, `HOME_CARE` |
+| `Category` | `FRUIT`, `VEGETABLES`, `MEAT_FISH`, `DAIRY_EGGS`, `BAKERY_BREAKFAST_SNACKS`, `PASTA_RICE_LEGUMES`, `COOKING_CONDIMENTS`, `DRINKS`, `HOUSEHOLD_CLEANING`, `PERSONAL_CARE` |
 
 Type and category are two independent axes. The first filter also exposes the
 archived state; its All option includes only active essential and secondary
@@ -40,11 +40,18 @@ selection is independent from adding the product to the cart and is retained
 when the parent returns to pending. With selections, the shopping list prints
 their concrete names; without selections, it prints the general product name.
 
-Two earlier designs were replaced:
+Earlier category designs were replaced:
 
-- Four categories (`FRESH`, `PANTRY`, `DRINKS`, `HOME_CARE`) — migration `000003`.
+- Four categories (`FRESH`, `PANTRY`, `DRINKS`, `HOME_CARE`) — migration `000003`
+  replaced them with six.
   `PANTRY` collided with the name of the app and `FRESH` held 44% of the
   catalog, which makes it useless as a filter.
+- The six-category model still grouped products by packaging rather than their
+  nature. Migration `000011` replaces it with the current ten categories,
+  separating fruit from vegetables and personal care from household products.
+
+An earlier navigation design was also replaced:
+
 - Three *views* (`PRIMARY`, `SECONDARY`, `OTHER`) selected from a side menu —
   migration `000004`. Views and categories both filtered the grid, so having two
   different interactions for the same job was needless. They are now the type

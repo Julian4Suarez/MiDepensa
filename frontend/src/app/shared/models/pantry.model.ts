@@ -7,12 +7,16 @@ export type ProductType = 'ESSENTIAL' | 'SECONDARY';
 
 /** Product group used for quick filtering, mirroring supermarket aisles. */
 export type Category =
-  | 'FRUIT_VEG'
+  | 'FRUIT'
+  | 'VEGETABLES'
   | 'MEAT_FISH'
   | 'DAIRY_EGGS'
-  | 'DRY_CANNED'
+  | 'BAKERY_BREAKFAST_SNACKS'
+  | 'PASTA_RICE_LEGUMES'
+  | 'COOKING_CONDIMENTS'
   | 'DRINKS'
-  | 'HOME_CARE';
+  | 'HOUSEHOLD_CLEANING'
+  | 'PERSONAL_CARE';
 
 /** Sentinels used by the filter bars for active and archived views. */
 export const ALL = 'ALL';

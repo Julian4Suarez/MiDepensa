@@ -56,35 +56,44 @@ func (t ProductType) IsValid() bool {
 type Category string
 
 const (
-	// CategoryFruitVeg covers fresh produce.
-	CategoryFruitVeg Category = "FRUIT_VEG"
+	// CategoryFruit contains fresh and preserved fruit sold as fruit.
+	CategoryFruit Category = "FRUIT"
+	// CategoryVegetables contains vegetables regardless of preservation method.
+	CategoryVegetables Category = "VEGETABLES"
 	// CategoryMeatFish covers meat, poultry and fish.
 	CategoryMeatFish Category = "MEAT_FISH"
 	// CategoryDairyEggs covers milk, cheese, butter and eggs.
-	CategoryDairyEggs Category = "DAIRY_EGGS"
-	// CategoryDryCanned covers non-perishable food: dry, canned and packaged.
-	CategoryDryCanned Category = "DRY_CANNED"
+	CategoryDairyEggs             Category = "DAIRY_EGGS"
+	CategoryBakeryBreakfastSnacks Category = "BAKERY_BREAKFAST_SNACKS"
+	CategoryPastaRiceLegumes      Category = "PASTA_RICE_LEGUMES"
+	CategoryCookingCondiments     Category = "COOKING_CONDIMENTS"
 	// CategoryDrinks covers everything drinkable.
-	CategoryDrinks Category = "DRINKS"
-	// CategoryHomeCare covers cleaning and personal-care supplies.
-	CategoryHomeCare Category = "HOME_CARE"
+	CategoryDrinks            Category = "DRINKS"
+	CategoryHouseholdCleaning Category = "HOUSEHOLD_CLEANING"
+	CategoryPersonalCare      Category = "PERSONAL_CARE"
 )
 
 // Categories lists every category in display order.
 var Categories = []Category{
-	CategoryFruitVeg,
+	CategoryFruit,
+	CategoryVegetables,
 	CategoryMeatFish,
 	CategoryDairyEggs,
-	CategoryDryCanned,
+	CategoryBakeryBreakfastSnacks,
+	CategoryPastaRiceLegumes,
+	CategoryCookingCondiments,
 	CategoryDrinks,
-	CategoryHomeCare,
+	CategoryHouseholdCleaning,
+	CategoryPersonalCare,
 }
 
 // IsValid reports whether the category is one of the known values.
 func (c Category) IsValid() bool {
 	switch c {
-	case CategoryFruitVeg, CategoryMeatFish, CategoryDairyEggs,
-		CategoryDryCanned, CategoryDrinks, CategoryHomeCare:
+	case CategoryFruit, CategoryVegetables, CategoryMeatFish, CategoryDairyEggs,
+		CategoryBakeryBreakfastSnacks, CategoryPastaRiceLegumes,
+		CategoryCookingCondiments, CategoryDrinks, CategoryHouseholdCleaning,
+		CategoryPersonalCare:
 		return true
 	default:
 		return false

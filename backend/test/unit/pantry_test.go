@@ -29,7 +29,7 @@ func TestNewPantryItem_TakesCategoryAndTypeFromCatalogDefaults(t *testing.T) {
 	product := entities.Product{
 		ID:              uuid.New(),
 		Code:            "tomato",
-		DefaultCategory: entities.CategoryFruitVeg,
+		DefaultCategory: entities.CategoryVegetables,
 		DefaultType:     entities.TypeEssential,
 	}
 	pantryID := uuid.New()
@@ -38,7 +38,7 @@ func TestNewPantryItem_TakesCategoryAndTypeFromCatalogDefaults(t *testing.T) {
 
 	assert.Equal(t, pantryID, item.PantryID)
 	assert.Equal(t, entities.StatusPending, item.Status)
-	assert.Equal(t, entities.CategoryFruitVeg, item.Category)
+	assert.Equal(t, entities.CategoryVegetables, item.Category)
 	assert.Equal(t, entities.TypeEssential, item.Type)
 }
 
@@ -70,7 +70,7 @@ func TestItemPatch_Apply_OnlyChangesProvidedFields(t *testing.T) {
 	item := entities.PantryItem{
 		Status:   entities.StatusDiscarded,
 		Type:     entities.TypeEssential,
-		Category: entities.CategoryFruitVeg,
+		Category: entities.CategoryVegetables,
 	}
 	status := entities.StatusInCart
 
@@ -78,7 +78,7 @@ func TestItemPatch_Apply_OnlyChangesProvidedFields(t *testing.T) {
 
 	assert.Equal(t, entities.StatusInCart, item.Status)
 	assert.Equal(t, entities.TypeEssential, item.Type)
-	assert.Equal(t, entities.CategoryFruitVeg, item.Category)
+	assert.Equal(t, entities.CategoryVegetables, item.Category)
 }
 
 func TestItemPatch_IsEmpty_ReportsWhetherAnythingWouldChange(t *testing.T) {
