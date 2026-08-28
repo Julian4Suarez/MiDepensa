@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ item.product.name }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()" aria-label="Close">
+        <ion-icon slot="icon-only" name="close-outline" />
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <p class="hint">Choose one or more options</p>
+  <ion-list lines="full">
+    @for (variant of item.product.variants; track variant.id) {
+      <ion-item>
+        <img
+          slot="start"
+          class="variant-image"
+          [src]="'assets/products/' + variant.image"
+          alt=""
+        />
+        <ion-checkbox
+          slot="end"
+          labelPlacement="start"
+          [checked]="selected().has(variant.id)"
+          (ionChange)="toggle(variant.id, $event.detail.checked)"
+        >
+          {{ variant.name }}
+        </ion-checkbox>
+      </ion-item>
+    }
+  </ion-list>
+
+  <ion-button expand="block" class="confirm" (click)="confirm()">
+    Save selection
+  </ion-button>
+</ion-content>

@@ -73,7 +73,7 @@ func registerDomainErrors() {
 	helpers.RegisterDomainError(services.ErrEmptyPatch,
 		http.StatusBadRequest, "empty_update", "provide at least one field to update")
 	helpers.RegisterDomainError(services.ErrInvalidPatch,
-		http.StatusBadRequest, "invalid_update", "status, type or category has an unknown value")
+		http.StatusBadRequest, "invalid_update", "status, type, category or product variant is invalid")
 	helpers.RegisterDomainError(services.ErrEmptyCatalog,
 		http.StatusServiceUnavailable, "catalog_unavailable", "product catalog is not seeded")
 }

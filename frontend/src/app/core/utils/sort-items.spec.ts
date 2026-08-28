@@ -3,10 +3,11 @@ import type { ItemStatus, PantryItem } from '../../shared/models/pantry.model';
 
 function item(name: string, status: ItemStatus): PantryItem {
   return {
-    product: { id: name, code: name, name, image: `${name}.svg` },
+    product: { id: name, code: name, name, image: `${name}.svg`, variants: [] },
     status,
     type: 'ESSENTIAL',
     category: 'FRUIT_VEG',
+    selectedVariantIds: [],
     updatedAt: '2026-01-01T00:00:00Z',
   };
 }

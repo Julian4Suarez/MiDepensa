@@ -83,7 +83,9 @@ func TestItemPatch_Apply_OnlyChangesProvidedFields(t *testing.T) {
 
 func TestItemPatch_IsEmpty_ReportsWhetherAnythingWouldChange(t *testing.T) {
 	status := entities.StatusPending
+	variants := []uuid.UUID{uuid.New()}
 
 	assert.True(t, entities.ItemPatch{}.IsEmpty())
 	assert.False(t, entities.ItemPatch{Status: &status}.IsEmpty())
+	assert.False(t, entities.ItemPatch{SelectedVariantIDs: &variants}.IsEmpty())
 }

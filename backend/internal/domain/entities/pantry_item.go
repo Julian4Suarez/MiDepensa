@@ -12,12 +12,13 @@ var ErrInvalidItemPatch = errors.New("pantry item: patch contains an invalid val
 
 // PantryItem is the per-pantry state of a catalog product.
 type PantryItem struct {
-	PantryID  uuid.UUID
-	Product   Product
-	Status    ItemStatus
-	Type      ProductType
-	Category  Category
-	UpdatedAt time.Time
+	PantryID           uuid.UUID
+	Product            Product
+	Status             ItemStatus
+	Type               ProductType
+	Category           Category
+	SelectedVariantIDs []uuid.UUID
+	UpdatedAt          time.Time
 }
 
 // NewPantryItem creates the initial item for a freshly created pantry, taking
@@ -41,14 +42,15 @@ func NewPantryItem(pantryID uuid.UUID, product Product) PantryItem {
 
 // ItemPatch is a partial update of a pantry item; nil fields are left untouched.
 type ItemPatch struct {
-	Status   *ItemStatus
-	Type     *ProductType
-	Category *Category
+	Status             *ItemStatus
+	Type               *ProductType
+	Category           *Category
+	SelectedVariantIDs *[]uuid.UUID
 }
 
 // IsEmpty reports whether the patch would change nothing.
 func (p ItemPatch) IsEmpty() bool {
-	return p.Status == nil && p.Type == nil && p.Category == nil
+	return p.Status == nil && p.Type == nil && p.Category == nil && p.SelectedVariantIDs == nil
 }
 
 // Validate rejects patches carrying values outside the known enums.
@@ -75,6 +77,9 @@ func (i *PantryItem) Apply(patch ItemPatch) {
 	}
 	if patch.Category != nil {
 		i.Category = *patch.Category
+	}
+	if patch.SelectedVariantIDs != nil {
+		i.SelectedVariantIDs = append([]uuid.UUID(nil), (*patch.SelectedVariantIDs)...)
 	}
 	i.UpdatedAt = time.Now().UTC()
 }

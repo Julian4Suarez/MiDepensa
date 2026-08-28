@@ -17,6 +17,9 @@ var ErrNotFound = errors.New("repository: resource not found")
 // ErrSlugTaken is returned when a pantry slug collides with an existing one.
 var ErrSlugTaken = errors.New("repository: slug already taken")
 
+// ErrInvalidVariant is returned when a variant does not belong to the product.
+var ErrInvalidVariant = errors.New("repository: invalid product variant")
+
 // PantryRepository persists pantries and their per-product state.
 type PantryRepository interface {
 	// Create stores the pantry together with its initial items atomically.

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -41,7 +42,41 @@ func (r *postgresProductRepository) List(ctx context.Context) ([]entities.Produc
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("persistence: list products: %w", err)
 	}
+	rows.Close()
+	if err := attachProductVariants(ctx, r.pool, products); err != nil {
+		return nil, err
+	}
 	return products, nil
+}
+
+func attachProductVariants(ctx context.Context, pool *pgxpool.Pool, products []entities.Product) error {
+	if len(products) == 0 {
+		return nil
+	}
+	ids := make([]uuid.UUID, len(products))
+	positions := make(map[uuid.UUID]int, len(products))
+	for i := range products {
+		ids[i] = products[i].ID
+		positions[products[i].ID] = i
+		products[i].Variants = make([]entities.ProductVariant, 0)
+	}
+	rows, err := pool.Query(ctx,
+		`SELECT id, product_id, code, name, image, sort_order
+		 FROM product_variants WHERE product_id = ANY($1) ORDER BY product_id, sort_order`, ids)
+	if err != nil {
+		return fmt.Errorf("persistence: list product variants: %w", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var variant entities.ProductVariant
+		if err := rows.Scan(&variant.ID, &variant.ProductID, &variant.Code, &variant.Name, &variant.Image, &variant.SortOrder); err != nil {
+			return fmt.Errorf("persistence: scan product variant: %w", err)
+		}
+		if position, ok := positions[variant.ProductID]; ok {
+			products[position].Variants = append(products[position].Variants, variant)
+		}
+	}
+	return rows.Err()
 }
 
 func scanProduct(row pgx.Row) (entities.Product, error) {

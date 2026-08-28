@@ -14,4 +14,5 @@ type Product struct {
 	DefaultType     ProductType
 	DefaultStatus   ItemStatus
 	SortOrder       int
+	Variants        []ProductVariant
 }

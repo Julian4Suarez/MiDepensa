@@ -36,7 +36,10 @@ import {
   FilterBarComponent,
   type FilterOption,
 } from '../../../../shared/components/filter-bar/filter-bar.component';
-import { ProductCardComponent } from '../../../../shared/components/product-card/product-card.component';
+import {
+  ProductCardComponent,
+  type StatusChange,
+} from '../../../../shared/components/product-card/product-card.component';
 import {
   ALL_ICON,
   CATEGORY_META,
@@ -56,6 +59,7 @@ import {
 } from '../../../../shared/models/pantry.model';
 import { ItemSettingsModalComponent } from '../../components/item-settings-modal/item-settings-modal.component';
 import { ShoppingListModalComponent } from '../../components/shopping-list-modal/shopping-list-modal.component';
+import { VariantSelectorModalComponent } from '../../components/variant-selector-modal/variant-selector-modal.component';
 import { PantryStore } from '../../pantry.store';
 
 /** The pantry screen: toolbar controls, two filter bars and the product grid. */
@@ -201,6 +205,24 @@ export class PantryPage implements OnInit {
     });
     await modal.present();
 
+    const { data } = await modal.onWillDismiss();
+    if (data) {
+      await this.store.patch(item, data);
+    }
+  }
+
+  protected async handleStatusChange(change: StatusChange): Promise<void> {
+    await this.store.setStatus(change.item, change.status);
+  }
+
+  protected async openVariants(item: PantryItem): Promise<void> {
+    const modal = await this.modals.create({
+      component: VariantSelectorModalComponent,
+      componentProps: { item },
+      breakpoints: [0, 0.7],
+      initialBreakpoint: 0.7,
+    });
+    await modal.present();
     const { data } = await modal.onWillDismiss();
     if (data) {
       await this.store.patch(item, data);

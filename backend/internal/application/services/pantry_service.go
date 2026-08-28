@@ -101,6 +101,9 @@ func (s *pantryService) UpdateItem(
 		if errors.Is(err, repositories.ErrNotFound) {
 			return nil, ErrItemNotFound
 		}
+		if errors.Is(err, repositories.ErrInvalidVariant) {
+			return nil, ErrInvalidPatch
+		}
 		return nil, err
 	}
 	return item, nil

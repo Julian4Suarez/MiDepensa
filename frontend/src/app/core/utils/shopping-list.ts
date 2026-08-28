@@ -13,7 +13,18 @@ export function buildShoppingList(items: PantryItem[]): string {
   return CATEGORIES.map((category) => {
     const lines = inCart
       .filter((item) => item.category === category)
-      .map((item) => `- ${item.product.name}`);
+      .flatMap((item) => {
+        if (item.product.variants.length === 0) {
+          return [`- ${item.product.name}`];
+        }
+        const selected = new Set(item.selectedVariantIds);
+        if (selected.size === 0) {
+          return [`- ${item.product.name}`];
+        }
+        return item.product.variants
+          .filter((variant) => selected.has(variant.id))
+          .map((variant) => `- ${variant.name}`);
+      });
 
     return lines.length ? `${CATEGORY_META[category].label}\n${lines.join('\n')}` : '';
   })

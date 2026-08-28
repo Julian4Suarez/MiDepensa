@@ -133,7 +133,47 @@ func (r *postgresPantryRepository) ListItems(
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("persistence: list pantry items: %w", err)
 	}
+	if err := r.attachVariantData(ctx, pantryID, items); err != nil {
+		return nil, err
+	}
 	return items, nil
+}
+
+func (r *postgresPantryRepository) attachVariantData(
+	ctx context.Context,
+	pantryID uuid.UUID,
+	items []entities.PantryItem,
+) error {
+	products := make([]entities.Product, len(items))
+	positions := make(map[uuid.UUID]int, len(items))
+	for i := range items {
+		products[i] = items[i].Product
+		positions[items[i].Product.ID] = i
+		items[i].SelectedVariantIDs = make([]uuid.UUID, 0)
+	}
+	if err := attachProductVariants(ctx, r.pool, products); err != nil {
+		return err
+	}
+	for i := range items {
+		items[i].Product = products[i]
+	}
+	rows, err := r.pool.Query(ctx,
+		`SELECT product_id, variant_id FROM pantry_item_variants
+		 WHERE pantry_id = $1 ORDER BY product_id, variant_id`, pantryID)
+	if err != nil {
+		return fmt.Errorf("persistence: list selected variants: %w", err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var productID, variantID uuid.UUID
+		if err := rows.Scan(&productID, &variantID); err != nil {
+			return fmt.Errorf("persistence: scan selected variant: %w", err)
+		}
+		if position, ok := positions[productID]; ok {
+			items[position].SelectedVariantIDs = append(items[position].SelectedVariantIDs, variantID)
+		}
+	}
+	return rows.Err()
 }
 
 // UpdateItem applies the non-nil patch fields and returns the resulting item.
@@ -143,7 +183,44 @@ func (r *postgresPantryRepository) UpdateItem(
 	productID uuid.UUID,
 	patch entities.ItemPatch,
 ) (*entities.PantryItem, error) {
-	row := r.pool.QueryRow(ctx,
+	tx, err := r.pool.Begin(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("persistence: begin item update: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	if patch.SelectedVariantIDs != nil {
+		unique := make(map[uuid.UUID]struct{}, len(*patch.SelectedVariantIDs))
+		for _, id := range *patch.SelectedVariantIDs {
+			unique[id] = struct{}{}
+		}
+		if len(unique) != len(*patch.SelectedVariantIDs) {
+			return nil, repositories.ErrInvalidVariant
+		}
+		if _, err := tx.Exec(ctx,
+			`DELETE FROM pantry_item_variants WHERE pantry_id = $1 AND product_id = $2`,
+			pantryID, productID,
+		); err != nil {
+			return nil, fmt.Errorf("persistence: clear selected variants: %w", err)
+		}
+		if len(*patch.SelectedVariantIDs) > 0 {
+			result, err := tx.Exec(ctx,
+				`INSERT INTO pantry_item_variants (pantry_id, product_id, variant_id)
+				 SELECT $1, $2, variant.id
+				 FROM unnest($3::uuid[]) AS requested(id)
+				 JOIN product_variants variant ON variant.id = requested.id AND variant.product_id = $2`,
+				pantryID, productID, *patch.SelectedVariantIDs,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("persistence: select product variants: %w", err)
+			}
+			if result.RowsAffected() != int64(len(*patch.SelectedVariantIDs)) {
+				return nil, repositories.ErrInvalidVariant
+			}
+		}
+	}
+
+	row := tx.QueryRow(ctx,
 		`WITH updated AS (
 		     UPDATE pantry_items
 		     SET status       = COALESCE($3, status),
@@ -170,6 +247,14 @@ func (r *postgresPantryRepository) UpdateItem(
 	if err != nil {
 		return nil, err
 	}
+	if err := tx.Commit(ctx); err != nil {
+		return nil, fmt.Errorf("persistence: commit item update: %w", err)
+	}
+	items := []entities.PantryItem{item}
+	if err := r.attachVariantData(ctx, pantryID, items); err != nil {
+		return nil, err
+	}
+	item = items[0]
 	return &item, nil
 }
 

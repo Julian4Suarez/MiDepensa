@@ -37,6 +37,23 @@
   margin: 0;
 }
 
+.variants {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  z-index: 1;
+  --color: var(--ion-color-primary);
+  --padding-start: 6px;
+  --padding-end: 6px;
+  margin: 0;
+}
+
+.variant-count {
+  margin-left: 2px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
 .body {
   display: flex;
   flex-direction: column;

@@ -1,7 +1,13 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { cartOutline, ellipsisHorizontal, timeOutline, trashOutline } from 'ionicons/icons';
+import {
+  cartOutline,
+  ellipsisHorizontal,
+  layersOutline,
+  timeOutline,
+  trashOutline,
+} from 'ionicons/icons';
 
 import { StatusPillComponent } from '../status-pill/status-pill.component';
 import type { PantryItem, ShoppingStatus } from '../../models/pantry.model';
@@ -32,10 +38,13 @@ export class ProductCardComponent {
   /** Emitted when the user opens the item settings. */
   readonly settingsOpened = output<PantryItem>();
 
+  /** Emitted from the explicit variants control on products that have choices. */
+  readonly variantsOpened = output<PantryItem>();
+
   constructor() {
     // Standalone Ionic requires every icon to be registered explicitly, which
     // keeps unused icons out of the bundle.
-    addIcons({ cartOutline, ellipsisHorizontal, timeOutline, trashOutline });
+    addIcons({ cartOutline, ellipsisHorizontal, layersOutline, timeOutline, trashOutline });
   }
 
   protected imageUrl(): string {

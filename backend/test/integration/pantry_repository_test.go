@@ -112,3 +112,47 @@ func TestPantryRepository_UpdateItem_WithUnknownProduct_ReturnsErrNotFound(t *te
 
 	assert.ErrorIs(t, err, repositories.ErrNotFound)
 }
+
+func TestPantryRepository_UpdateItem_PersistsSelectedVariants(t *testing.T) {
+	ctx := context.Background()
+	pool := newPool(t)
+	pantryRepository := persistence.NewPostgresPantryRepository(pool)
+	productRepository := persistence.NewPostgresProductRepository(pool)
+
+	catalog, err := productRepository.List(ctx)
+	require.NoError(t, err)
+	var product entities.Product
+	for _, candidate := range catalog {
+		if len(candidate.Variants) >= 2 {
+			product = candidate
+			break
+		}
+	}
+	require.NotEqual(t, uuid.Nil, product.ID)
+
+	pantry, err := entities.NewPantry("Variants " + uuid.NewString()[:8])
+	require.NoError(t, err)
+	require.NoError(t, pantryRepository.Create(ctx, pantry, []entities.PantryItem{
+		entities.NewPantryItem(pantry.ID, product),
+	}))
+	t.Cleanup(func() { _, _ = pool.Exec(ctx, `DELETE FROM pantries WHERE id = $1`, pantry.ID) })
+
+	status := entities.StatusInCart
+	selected := []uuid.UUID{product.Variants[0].ID, product.Variants[1].ID}
+	updated, err := pantryRepository.UpdateItem(ctx, pantry.ID, product.ID, entities.ItemPatch{
+		Status: &status, SelectedVariantIDs: &selected,
+	})
+
+	require.NoError(t, err)
+	assert.Equal(t, entities.StatusInCart, updated.Status)
+	assert.ElementsMatch(t, selected, updated.SelectedVariantIDs)
+	assert.Len(t, updated.Product.Variants, len(product.Variants))
+
+	empty := []uuid.UUID{}
+	updated, err = pantryRepository.UpdateItem(ctx, pantry.ID, product.ID, entities.ItemPatch{
+		SelectedVariantIDs: &empty,
+	})
+	require.NoError(t, err)
+	assert.Empty(t, updated.SelectedVariantIDs)
+	assert.Equal(t, entities.StatusInCart, updated.Status)
+}

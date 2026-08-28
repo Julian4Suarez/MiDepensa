@@ -67,7 +67,8 @@
       @for (item of store.visibleItems(); track item.product.id) {
         <app-product-card
           [item]="item"
-          (statusChanged)="store.setStatus($event.item, $event.status)"
+          (statusChanged)="handleStatusChange($event)"
+          (variantsOpened)="openVariants($event)"
           (settingsOpened)="openSettings($event)"
         />
       }

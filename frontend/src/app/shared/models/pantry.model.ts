@@ -25,12 +25,20 @@ export type StatusFilter = ShoppingStatus | typeof ALL;
 export type SortMode = 'DEFAULT' | 'NAME' | 'STATUS';
 
 /** A catalog entry. */
+export interface ProductVariant {
+  id: string;
+  code: string;
+  name: string;
+  image: string;
+}
+
 export interface Product {
   id: string;
   code: string;
   name: string;
   /** File name under assets/products, e.g. "tomato.svg". */
   image: string;
+  variants: ProductVariant[];
 }
 
 /** The per-pantry state of a catalog product. */
@@ -39,6 +47,7 @@ export interface PantryItem {
   status: ItemStatus;
   type: ProductType;
   category: Category;
+  selectedVariantIds: string[];
   updatedAt: string;
 }
 
@@ -61,6 +70,7 @@ export interface ItemPatch {
   status?: ItemStatus;
   type?: ProductType;
   category?: Category;
+  selectedVariantIds?: string[];
 }
 
 /** Error envelope returned by the API. */

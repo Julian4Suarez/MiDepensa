@@ -1,0 +1,20 @@
+.hint {
+  margin: 16px 16px 8px;
+  color: var(--app-text-muted);
+  font-size: 0.9rem;
+}
+
+.variant-image {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+ion-checkbox {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.confirm {
+  margin: 20px 16px 16px;
+}
