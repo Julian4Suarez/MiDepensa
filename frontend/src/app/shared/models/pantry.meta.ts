@@ -25,19 +25,19 @@ export const CATEGORY_META: Record<Category, { label: string; icon: string }> = 
   HOME_CARE: { label: 'Home & care', icon: 'sparkles-outline' },
 };
 
-/** Display order and labelling of the three product types. */
-export const TYPES: readonly ProductType[] = ['ESSENTIAL', 'SECONDARY', 'OTHERS'];
+/** Display order and labelling of the two active product types. */
+export const TYPES: readonly ProductType[] = ['ESSENTIAL', 'SECONDARY'];
 
 export const TYPE_META: Record<ProductType, { label: string; icon: string }> = {
   ESSENTIAL: { label: 'Essential', icon: 'star-outline' },
   SECONDARY: { label: 'Secondary', icon: 'bookmark-outline' },
-  OTHERS: { label: 'Others', icon: 'ellipsis-horizontal-outline' },
 };
 
 export const STATUS_META: Record<StockStatus, { label: string; color: string }> = {
   OUT: { label: 'Out', color: 'danger' },
   LOW: { label: 'Low', color: 'warning' },
   OK: { label: 'Enough', color: 'success' },
+  ARCHIVED: { label: 'Archived', color: 'medium' },
 };
 
 /**
@@ -48,6 +48,7 @@ export const NEXT_STATUS: Record<StockStatus, StockStatus> = {
   OK: 'LOW',
   LOW: 'OUT',
   OUT: 'OK',
+  ARCHIVED: 'ARCHIVED',
 };
 
 /** Sort options offered by the toolbar, in the order they are listed. */

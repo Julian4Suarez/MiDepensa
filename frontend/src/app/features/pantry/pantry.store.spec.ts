@@ -5,10 +5,15 @@ import { PantryApiService } from '../../core/services/pantry-api.service';
 import type { Category, PantryItem, ProductType } from '../../shared/models/pantry.model';
 import { PantryStore } from './pantry.store';
 
-function item(name: string, type: ProductType, category: Category): PantryItem {
+function item(
+  name: string,
+  type: ProductType,
+  category: Category,
+  status: PantryItem['status'] = 'OK',
+): PantryItem {
   return {
     product: { id: name, code: name, name, image: `${name}.svg` },
-    status: 'OK',
+    status,
     type,
     category,
     updatedAt: '2026-01-01T00:00:00Z',
@@ -19,7 +24,7 @@ describe('PantryStore', () => {
   const items = [
     item('Tomatoes', 'ESSENTIAL', 'FRUIT_VEG'),
     item('Rice', 'ESSENTIAL', 'DRY_CANNED'),
-    item('Wine', 'OTHERS', 'DRINKS'),
+    item('Wine', 'SECONDARY', 'DRINKS', 'ARCHIVED'),
     item('Dish soap', 'SECONDARY', 'HOME_CARE'),
   ];
 
@@ -52,16 +57,20 @@ describe('PantryStore', () => {
     await store.load('familia');
   }
 
-  it('filters by the selected type', async () => {
+  it('shows only active products for All and only archived products for Archived', async () => {
     await loadPantry();
 
     expect(store.visibleItems().map((i) => i.product.name)).toEqual(['Tomatoes', 'Rice']);
 
-    store.selectType('OTHERS');
+    store.selectType('ARCHIVED');
     expect(store.visibleItems().map((i) => i.product.name)).toEqual(['Wine']);
 
     store.selectType('ALL');
-    expect(store.visibleItems()).toHaveLength(4);
+    expect(store.visibleItems().map((i) => i.product.name)).toEqual([
+      'Tomatoes',
+      'Rice',
+      'Dish soap',
+    ]);
   });
 
   it('filters by the selected category inside the type', async () => {
@@ -82,7 +91,7 @@ describe('PantryStore', () => {
     await loadPantry();
     store.category.set('DRY_CANNED');
 
-    store.selectType('OTHERS');
+    store.selectType('ARCHIVED');
 
     expect(store.category()).toBe('DRY_CANNED');
     expect(store.availableCategories()).toEqual(['DRY_CANNED', 'DRINKS']);
@@ -94,7 +103,7 @@ describe('PantryStore', () => {
     store.selectType('SECONDARY');
     store.category.set('HOME_CARE');
 
-    store.selectType('OTHERS');
+    store.selectType('ARCHIVED');
 
     expect(store.category()).toBe('HOME_CARE');
     expect(store.availableCategories()).toEqual(['DRINKS', 'HOME_CARE']);
@@ -109,6 +118,15 @@ describe('PantryStore', () => {
 
     expect(api.updateItem).toHaveBeenCalledWith('familia', 'Tomatoes', { status: 'LOW' });
     expect(store.items()[0].status).toBe('LOW');
+  });
+
+  it('does not cycle the stock status of an archived product', async () => {
+    await loadPantry();
+
+    await store.cycleStatus(store.items()[2]);
+
+    expect(api.updateItem).not.toHaveBeenCalled();
+    expect(store.items()[2].status).toBe('ARCHIVED');
   });
 
   it('rolls the optimistic update back when the request fails', async () => {

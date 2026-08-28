@@ -1,7 +1,7 @@
 import type { PantryItem, SortMode, StockStatus } from '../../shared/models/pantry.model';
 
 /** Most urgent first, so a shopping trip starts at the top of the grid. */
-const STATUS_ORDER: Record<StockStatus, number> = { OUT: 0, LOW: 1, OK: 2 };
+const STATUS_ORDER: Record<StockStatus, number> = { OUT: 0, LOW: 1, OK: 2, ARCHIVED: 3 };
 
 /**
  * Returns a new array ordered by `mode`.

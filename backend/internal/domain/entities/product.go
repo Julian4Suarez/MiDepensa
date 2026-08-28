@@ -12,5 +12,6 @@ type Product struct {
 	Image           string
 	DefaultCategory Category
 	DefaultType     ProductType
+	DefaultStatus   StockStatus
 	SortOrder       int
 }

@@ -182,6 +182,7 @@ func scanPantryItem(row pgx.Row, pantryID uuid.UUID) (entities.PantryItem, error
 		&item.Product.Image,
 		&item.Product.DefaultCategory,
 		&item.Product.DefaultType,
+		&item.Product.DefaultStatus,
 		&item.Product.SortOrder,
 		&item.Status,
 		&item.Type,

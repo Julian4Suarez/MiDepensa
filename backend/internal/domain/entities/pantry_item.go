@@ -21,12 +21,18 @@ type PantryItem struct {
 }
 
 // NewPantryItem creates the initial item for a freshly created pantry, taking
-// its category and type from the catalog defaults.
+// its category, type and status from the catalog defaults.
 func NewPantryItem(pantryID uuid.UUID, product Product) PantryItem {
+	status := product.DefaultStatus
+	// Keep hand-built products backwards compatible while requiring persisted
+	// catalog rows to declare their default explicitly.
+	if !status.IsValid() {
+		status = StatusOK
+	}
 	return PantryItem{
 		PantryID:  pantryID,
 		Product:   product,
-		Status:    StatusOK,
+		Status:    status,
 		Type:      product.DefaultType,
 		Category:  product.DefaultCategory,
 		UpdatedAt: time.Now().UTC(),

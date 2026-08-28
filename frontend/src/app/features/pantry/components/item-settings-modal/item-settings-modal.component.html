@@ -42,4 +42,12 @@
   </div>
 
   <ion-button expand="block" class="save" (click)="save()">Save</ion-button>
+  <ion-button
+    expand="block"
+    fill="outline"
+    [color]="item.status === 'ARCHIVED' ? 'success' : 'medium'"
+    (click)="toggleArchived()"
+  >
+    {{ item.status === 'ARCHIVED' ? 'Restore product' : 'Archive product' }}
+  </ion-button>
 </ion-content>

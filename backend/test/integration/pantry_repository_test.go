@@ -46,7 +46,7 @@ func TestPantryRepository_CreateAndRead_RoundTripsPantryWithItems(t *testing.T) 
 	storedItems, err := pantryRepository.ListItems(ctx, pantry.ID)
 	require.NoError(t, err)
 	assert.Len(t, storedItems, len(catalog))
-	assert.Equal(t, entities.StatusOK, storedItems[0].Status)
+	assert.Equal(t, catalog[0].DefaultStatus, storedItems[0].Status)
 	assert.NotEmpty(t, storedItems[0].Product.Code)
 }
 

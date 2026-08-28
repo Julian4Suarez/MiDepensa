@@ -16,11 +16,12 @@ import { addIcons } from 'ionicons';
 import { closeOutline } from 'ionicons/icons';
 
 import { CATEGORIES, CATEGORY_META, TYPES, TYPE_META } from '../../../../shared/models/pantry.meta';
-import type {
-  Category,
-  ItemPatch,
-  PantryItem,
-  ProductType,
+import {
+  ARCHIVED,
+  type Category,
+  type ItemPatch,
+  type PantryItem,
+  type ProductType,
 } from '../../../../shared/models/pantry.model';
 
 /**
@@ -91,5 +92,11 @@ export class ItemSettingsModalComponent {
       patch.category = this.currentCategory();
     }
     void this.modals.dismiss(Object.keys(patch).length ? patch : undefined);
+  }
+
+  protected toggleArchived(): void {
+    void this.modals.dismiss({
+      status: this.item.status === ARCHIVED ? 'OK' : ARCHIVED,
+    } satisfies ItemPatch);
   }
 }

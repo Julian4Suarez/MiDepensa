@@ -12,7 +12,12 @@
   <button
     type="button"
     class="body"
-    [attr.aria-label]="'Change stock of ' + item().product.name"
+    [attr.aria-label]="
+      item().status === 'ARCHIVED'
+        ? item().product.name + ' is archived'
+        : 'Change stock of ' + item().product.name
+    "
+    [disabled]="item().status === 'ARCHIVED'"
     (click)="statusToggled.emit(item())"
   >
     <img class="image" [src]="imageUrl()" [alt]="item().product.name" loading="lazy" />

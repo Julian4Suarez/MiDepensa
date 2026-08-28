@@ -34,6 +34,11 @@ import type { StockStatus } from '../../models/pantry.model';
       background: var(--app-status-ok-soft);
       color: var(--ion-color-success-shade);
     }
+
+    .pill[data-status='ARCHIVED'] {
+      background: var(--ion-color-light-shade);
+      color: var(--ion-color-medium-shade);
+    }
   `,
 })
 export class StatusPillComponent {

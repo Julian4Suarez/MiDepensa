@@ -6,6 +6,7 @@ import { sortItems } from '../../core/utils/sort-items';
 import { CATEGORIES, NEXT_STATUS } from '../../shared/models/pantry.meta';
 import {
   ALL,
+  ARCHIVED,
   type Category,
   type CategoryFilter,
   type ItemPatch,
@@ -41,7 +42,13 @@ export class PantryStore {
   /** Items matching the type filter, before narrowing down by category. */
   readonly itemsOfType = computed(() => {
     const type = this.type();
-    return type === ALL ? this.items() : this.items().filter((item) => item.type === type);
+    if (type === ARCHIVED) {
+      return this.items().filter((item) => item.status === ARCHIVED);
+    }
+    if (type === ALL) {
+      return this.items().filter((item) => item.status !== ARCHIVED);
+    }
+    return this.items().filter((item) => item.type === type && item.status !== ARCHIVED);
   });
 
   /** Items shown in the grid: type, then category, then sort order. */
@@ -92,6 +99,9 @@ export class PantryStore {
 
   /** Advances an item to the next stock status. */
   cycleStatus(item: PantryItem): Promise<void> {
+    if (item.status === ARCHIVED) {
+      return Promise.resolve();
+    }
     return this.patch(item, { status: NEXT_STATUS[item.status] });
   }
 

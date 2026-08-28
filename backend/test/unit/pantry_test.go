@@ -42,6 +42,20 @@ func TestNewPantryItem_TakesCategoryAndTypeFromCatalogDefaults(t *testing.T) {
 	assert.Equal(t, entities.TypeEssential, item.Type)
 }
 
+func TestNewPantryItem_TakesArchivedStatusFromCatalogDefault(t *testing.T) {
+	product := entities.Product{
+		ID:              uuid.New(),
+		DefaultCategory: entities.CategoryDrinks,
+		DefaultType:     entities.TypeSecondary,
+		DefaultStatus:   entities.StatusArchived,
+	}
+
+	item := entities.NewPantryItem(uuid.New(), product)
+
+	assert.Equal(t, entities.StatusArchived, item.Status)
+	assert.Equal(t, entities.TypeSecondary, item.Type)
+}
+
 func TestItemPatch_Validate_RejectsUnknownEnumValues(t *testing.T) {
 	unknownStatus := entities.StockStatus("SOLD_OUT")
 	unknownType := entities.ProductType("FAVOURITES")

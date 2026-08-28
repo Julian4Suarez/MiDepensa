@@ -15,12 +15,13 @@ Pantry 1 ──── * PantryItem * ──── 1 Product
 
 | Enum | Values |
 | --- | --- |
-| `StockStatus` | `OUT` (red), `LOW` (amber), `OK` (green) |
-| `ProductType` | `ESSENTIAL`, `SECONDARY`, `OTHERS` |
+| `StockStatus` | `OUT` (red), `LOW` (amber), `OK` (green), `ARCHIVED` |
+| `ProductType` | `ESSENTIAL`, `SECONDARY` |
 | `Category` | `FRUIT_VEG`, `MEAT_FISH`, `DAIRY_EGGS`, `DRY_CANNED`, `DRINKS`, `HOME_CARE` |
 
-Type and category are two independent axes, and the pantry screen exposes both
-as filter bars: type answers *how often do I buy this*, category mirrors
+Type and category are two independent axes. The first filter also exposes the
+archived state; its All option includes only active essential and secondary
+products. Type answers *how often do I buy this*, while category mirrors
 **supermarket aisles**, because the generated shopping list is grouped by
 category and should follow the route you walk through the shop.
 

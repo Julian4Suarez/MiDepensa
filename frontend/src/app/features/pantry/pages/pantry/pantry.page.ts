@@ -15,10 +15,10 @@ import {
 import { addIcons } from 'ionicons';
 import {
   appsOutline,
+  archiveOutline,
   bookmarkOutline,
   cartOutline,
   eggOutline,
-  ellipsisHorizontalOutline,
   fileTrayStackedOutline,
   fishOutline,
   homeOutline,
@@ -44,6 +44,7 @@ import {
 } from '../../../../shared/models/pantry.meta';
 import {
   ALL,
+  ARCHIVED,
   type CategoryFilter,
   type PantryItem,
   type TypeFilter,
@@ -90,6 +91,7 @@ export class PantryPage implements OnInit {
   protected readonly typeOptions: FilterOption[] = [
     this.allOption,
     ...TYPES.map((type) => ({ value: type, ...TYPE_META[type] })),
+    { value: ARCHIVED, label: 'Archived', icon: 'archive-outline' },
   ];
 
   /** Rebuilt whenever the type filter changes the set of available categories. */
@@ -104,7 +106,7 @@ export class PantryPage implements OnInit {
     addIcons({
       starOutline,
       bookmarkOutline,
-      ellipsisHorizontalOutline,
+      archiveOutline,
       nutritionOutline,
       fishOutline,
       eggOutline,

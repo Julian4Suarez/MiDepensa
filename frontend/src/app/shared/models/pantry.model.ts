@@ -1,8 +1,8 @@
-/** How much of a product is left. Mirrors the backend enum. */
-export type StockStatus = 'OUT' | 'LOW' | 'OK';
+/** Current stock state, or archived when hidden from active views. */
+export type StockStatus = 'OUT' | 'LOW' | 'OK' | 'ARCHIVED';
 
 /** How often a product is bought. The coarse filter of the pantry screen. */
-export type ProductType = 'ESSENTIAL' | 'SECONDARY' | 'OTHERS';
+export type ProductType = 'ESSENTIAL' | 'SECONDARY';
 
 /** Product group used for quick filtering, mirroring supermarket aisles. */
 export type Category =
@@ -13,10 +13,11 @@ export type Category =
   | 'DRINKS'
   | 'HOME_CARE';
 
-/** Sentinel used by the filter bars when nothing is narrowed down. */
+/** Sentinels used by the filter bars for active and archived views. */
 export const ALL = 'ALL';
+export const ARCHIVED = 'ARCHIVED';
 export type CategoryFilter = Category | typeof ALL;
-export type TypeFilter = ProductType | typeof ALL;
+export type TypeFilter = ProductType | typeof ALL | typeof ARCHIVED;
 
 /** How the product grid is ordered. */
 export type SortMode = 'DEFAULT' | 'NAME' | 'STATUS';

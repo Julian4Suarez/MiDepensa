@@ -1,6 +1,6 @@
 package entities
 
-// StockStatus is how much of a product is left in a pantry.
+// StockStatus is the current stock state, or archived when removed from active views.
 type StockStatus string
 
 const (
@@ -10,15 +10,17 @@ const (
 	StatusLow StockStatus = "LOW"
 	// StatusOK means there is enough of the product (rendered green).
 	StatusOK StockStatus = "OK"
+	// StatusArchived removes the product from the active pantry views.
+	StatusArchived StockStatus = "ARCHIVED"
 )
 
 // StockStatuses lists every stock status in display order.
-var StockStatuses = []StockStatus{StatusOut, StatusLow, StatusOK}
+var StockStatuses = []StockStatus{StatusOut, StatusLow, StatusOK, StatusArchived}
 
 // IsValid reports whether the status is one of the known values.
 func (s StockStatus) IsValid() bool {
 	switch s {
-	case StatusOut, StatusLow, StatusOK:
+	case StatusOut, StatusLow, StatusOK, StatusArchived:
 		return true
 	default:
 		return false
@@ -34,17 +36,15 @@ const (
 	TypeEssential ProductType = "ESSENTIAL"
 	// TypeSecondary is bought from time to time.
 	TypeSecondary ProductType = "SECONDARY"
-	// TypeOthers is rarely or never bought.
-	TypeOthers ProductType = "OTHERS"
 )
 
 // ProductTypes lists every type in display order.
-var ProductTypes = []ProductType{TypeEssential, TypeSecondary, TypeOthers}
+var ProductTypes = []ProductType{TypeEssential, TypeSecondary}
 
 // IsValid reports whether the type is one of the known values.
 func (t ProductType) IsValid() bool {
 	switch t {
-	case TypeEssential, TypeSecondary, TypeOthers:
+	case TypeEssential, TypeSecondary:
 		return true
 	default:
 		return false
