@@ -32,7 +32,7 @@ func (h *CatalogHandler) Get(c *gin.Context) {
 		Products:   make([]productResponse, 0, len(products)),
 		Categories: enumValues(entities.Categories),
 		Types:      enumValues(entities.ProductTypes),
-		Statuses:   enumValues(entities.StockStatuses),
+		Statuses:   enumValues(entities.ItemStatuses),
 	}
 	for _, product := range products {
 		response.Products = append(response.Products, toProductResponse(product))

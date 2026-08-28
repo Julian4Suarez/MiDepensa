@@ -1,13 +1,18 @@
-import type { PantryItem, SortMode, StockStatus } from '../../shared/models/pantry.model';
+import type { ItemStatus, PantryItem, SortMode } from '../../shared/models/pantry.model';
 
-/** Most urgent first, so a shopping trip starts at the top of the grid. */
-const STATUS_ORDER: Record<StockStatus, number> = { OUT: 0, LOW: 1, OK: 2, ARCHIVED: 3 };
+/** Pending decisions first, followed by cart, discarded and archived items. */
+const STATUS_ORDER: Record<ItemStatus, number> = {
+  PENDING: 0,
+  IN_CART: 1,
+  DISCARDED: 2,
+  ARCHIVED: 3,
+};
 
 /**
  * Returns a new array ordered by `mode`.
  *
  * `DEFAULT` keeps the catalog order the API returned. Array sort is stable, so
- * sorting by stock level preserves the catalog order within each status.
+ * sorting by status preserves the catalog order within each state.
  */
 export function sortItems(items: PantryItem[], mode: SortMode): PantryItem[] {
   switch (mode) {

@@ -1,4 +1,10 @@
-import type { Category, ProductType, SortMode, StockStatus } from './pantry.model';
+import type {
+  Category,
+  ItemStatus,
+  ProductType,
+  ShoppingStatus,
+  SortMode,
+} from './pantry.model';
 
 /** Icon used by the "All" chip of every filter bar. */
 export const ALL_ICON = 'apps-outline';
@@ -33,22 +39,13 @@ export const TYPE_META: Record<ProductType, { label: string; icon: string }> = {
   SECONDARY: { label: 'Secondary', icon: 'bookmark-outline' },
 };
 
-export const STATUS_META: Record<StockStatus, { label: string; color: string }> = {
-  OUT: { label: 'Out', color: 'danger' },
-  LOW: { label: 'Low', color: 'warning' },
-  OK: { label: 'Enough', color: 'success' },
-  ARCHIVED: { label: 'Archived', color: 'medium' },
-};
+export const SHOPPING_STATUSES: readonly ShoppingStatus[] = ['DISCARDED', 'PENDING', 'IN_CART'];
 
-/**
- * Tapping the status pill walks stock downwards and wraps around, which is the
- * direction a pantry is actually used: enough -> low -> out -> restocked.
- */
-export const NEXT_STATUS: Record<StockStatus, StockStatus> = {
-  OK: 'LOW',
-  LOW: 'OUT',
-  OUT: 'OK',
-  ARCHIVED: 'ARCHIVED',
+export const STATUS_META: Record<ItemStatus, { label: string; color: string }> = {
+  DISCARDED: { label: 'Discarded', color: 'medium' },
+  PENDING: { label: 'Pending', color: 'warning' },
+  IN_CART: { label: 'In cart', color: 'success' },
+  ARCHIVED: { label: 'Archived', color: 'medium' },
 };
 
 /** Sort options offered by the toolbar, in the order they are listed. */
@@ -57,5 +54,5 @@ export const SORT_MODES: readonly SortMode[] = ['DEFAULT', 'NAME', 'STATUS'];
 export const SORT_META: Record<SortMode, { label: string }> = {
   DEFAULT: { label: 'Catalog order' },
   NAME: { label: 'Name (A–Z)' },
-  STATUS: { label: 'Stock level' },
+  STATUS: { label: 'Shopping status' },
 };

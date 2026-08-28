@@ -10,17 +10,6 @@
 </ion-header>
 
 <ion-content>
-  <div class="options">
-    <ion-checkbox
-      labelPlacement="end"
-      justify="start"
-      [checked]="includeLow()"
-      (ionChange)="includeLow.set($event.detail.checked)"
-    >
-      Also include products running low
-    </ion-checkbox>
-  </div>
-
   @if (text()) {
     <pre class="preview">{{ text() }}</pre>
     <ion-button expand="block" class="copy" (click)="copy()">
@@ -28,6 +17,6 @@
       Copy
     </ion-button>
   } @else {
-    <p class="empty text-muted">Nothing to buy with these filters.</p>
+    <p class="empty text-muted">There are no products in the cart.</p>
   }
 </ion-content>

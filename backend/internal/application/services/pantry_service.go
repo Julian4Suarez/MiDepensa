@@ -105,3 +105,15 @@ func (s *pantryService) UpdateItem(
 	}
 	return item, nil
 }
+
+// ResetActiveItems marks every non-archived item as pending.
+func (s *pantryService) ResetActiveItems(ctx context.Context, slug valueobjects.Slug) error {
+	pantry, err := s.pantries.GetBySlug(ctx, slug)
+	if err != nil {
+		if errors.Is(err, repositories.ErrNotFound) {
+			return ErrPantryNotFound
+		}
+		return err
+	}
+	return s.pantries.ResetActiveItems(ctx, pantry.ID)
+}

@@ -17,10 +17,11 @@ import (
 // mockPantryRepository is a hand-written stub: each method delegates to a
 // function field the test sets, so no mocking framework is needed.
 type mockPantryRepository struct {
-	CreateFn     func(ctx context.Context, p *entities.Pantry, items []entities.PantryItem) error
-	GetBySlugFn  func(ctx context.Context, slug valueobjects.Slug) (*entities.Pantry, error)
-	ListItemsFn  func(ctx context.Context, pantryID uuid.UUID) ([]entities.PantryItem, error)
-	UpdateItemFn func(ctx context.Context, pantryID, productID uuid.UUID, patch entities.ItemPatch) (*entities.PantryItem, error)
+	CreateFn           func(ctx context.Context, p *entities.Pantry, items []entities.PantryItem) error
+	GetBySlugFn        func(ctx context.Context, slug valueobjects.Slug) (*entities.Pantry, error)
+	ListItemsFn        func(ctx context.Context, pantryID uuid.UUID) ([]entities.PantryItem, error)
+	UpdateItemFn       func(ctx context.Context, pantryID, productID uuid.UUID, patch entities.ItemPatch) (*entities.PantryItem, error)
+	ResetActiveItemsFn func(ctx context.Context, pantryID uuid.UUID) error
 }
 
 func (m *mockPantryRepository) Create(ctx context.Context, p *entities.Pantry, items []entities.PantryItem) error {
@@ -37,6 +38,10 @@ func (m *mockPantryRepository) ListItems(ctx context.Context, pantryID uuid.UUID
 
 func (m *mockPantryRepository) UpdateItem(ctx context.Context, pantryID, productID uuid.UUID, patch entities.ItemPatch) (*entities.PantryItem, error) {
 	return m.UpdateItemFn(ctx, pantryID, productID, patch)
+}
+
+func (m *mockPantryRepository) ResetActiveItems(ctx context.Context, pantryID uuid.UUID) error {
+	return m.ResetActiveItemsFn(ctx, pantryID)
 }
 
 type mockProductRepository struct {
@@ -72,7 +77,7 @@ func TestCreate_WithValidName_SeedsOneItemPerCatalogProduct(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "familia-suarez", pantry.Slug.String())
 	require.Len(t, seeded, 2)
-	assert.Equal(t, entities.StatusOK, seeded[0].Status)
+	assert.Equal(t, entities.StatusPending, seeded[0].Status)
 	assert.Equal(t, entities.TypeEssential, seeded[0].Type)
 }
 
@@ -134,7 +139,7 @@ func TestUpdateItem_WithEmptyPatch_ReturnsErrorBeforeTouchingTheRepository(t *te
 
 func TestUpdateItem_WithUnknownStatus_ReturnsInvalidPatchError(t *testing.T) {
 	service := services.NewPantryService(&mockPantryRepository{}, &mockProductRepository{})
-	unknown := entities.StockStatus("SOLD_OUT")
+	unknown := entities.ItemStatus("UNKNOWN")
 
 	_, err := service.UpdateItem(context.Background(), "familia", uuid.New(), entities.ItemPatch{Status: &unknown})
 
@@ -151,9 +156,30 @@ func TestUpdateItem_WithUnknownProduct_ReturnsItemNotFoundError(t *testing.T) {
 		},
 	}
 	service := services.NewPantryService(pantries, &mockProductRepository{})
-	status := entities.StatusOut
+	status := entities.StatusInCart
 
 	_, err := service.UpdateItem(context.Background(), "familia", uuid.New(), entities.ItemPatch{Status: &status})
 
 	assert.ErrorIs(t, err, services.ErrItemNotFound)
+}
+
+func TestResetActiveItems_ResetsTheResolvedPantry(t *testing.T) {
+	pantryID := uuid.New()
+	reset := false
+	pantries := &mockPantryRepository{
+		GetBySlugFn: func(context.Context, valueobjects.Slug) (*entities.Pantry, error) {
+			return &entities.Pantry{ID: pantryID}, nil
+		},
+		ResetActiveItemsFn: func(_ context.Context, got uuid.UUID) error {
+			reset = true
+			assert.Equal(t, pantryID, got)
+			return nil
+		},
+	}
+	service := services.NewPantryService(pantries, &mockProductRepository{})
+
+	err := service.ResetActiveItems(context.Background(), "familia")
+
+	require.NoError(t, err)
+	assert.True(t, reset)
 }

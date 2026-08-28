@@ -25,6 +25,9 @@ type PantryService interface {
 		productID uuid.UUID,
 		patch entities.ItemPatch,
 	) (*entities.PantryItem, error)
+
+	// ResetActiveItems marks every non-archived item as pending.
+	ResetActiveItems(ctx context.Context, slug valueobjects.Slug) error
 }
 
 // CatalogService exposes the read-only product catalog.

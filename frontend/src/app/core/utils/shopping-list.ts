@@ -4,19 +4,16 @@ import type { PantryItem } from '../../shared/models/pantry.model';
 /**
  * Builds the plain-text shopping list, grouped by category.
  *
- * Products that are out of stock are always included; running-low products are
- * added only when `includeLow` is set and are suffixed with "(low)".
- * Returns an empty string when nothing needs buying.
+ * Only products explicitly placed in the cart are included. Returns an empty
+ * string when the cart is empty.
  */
-export function buildShoppingList(items: PantryItem[], includeLow: boolean): string {
-  const needed = items.filter(
-    (item) => item.status === 'OUT' || (includeLow && item.status === 'LOW'),
-  );
+export function buildShoppingList(items: PantryItem[]): string {
+  const inCart = items.filter((item) => item.status === 'IN_CART');
 
   return CATEGORIES.map((category) => {
-    const lines = needed
+    const lines = inCart
       .filter((item) => item.category === category)
-      .map((item) => `- ${item.product.name}${item.status === 'LOW' ? ' (low)' : ''}`);
+      .map((item) => `- ${item.product.name}`);
 
     return lines.length ? `${CATEGORY_META[category].label}\n${lines.join('\n')}` : '';
   })

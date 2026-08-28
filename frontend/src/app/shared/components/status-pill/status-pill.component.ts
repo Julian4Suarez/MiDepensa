@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 import { STATUS_META } from '../../models/pantry.meta';
-import type { StockStatus } from '../../models/pantry.model';
+import type { ItemStatus } from '../../models/pantry.model';
 
-/** Coloured pill showing the stock status of a product. */
+/** Coloured pill showing the shopping status of a product. */
 @Component({
   selector: 'app-status-pill',
   standalone: true,
@@ -20,17 +20,17 @@ import type { StockStatus } from '../../models/pantry.model';
       white-space: nowrap;
     }
 
-    .pill[data-status='OUT'] {
-      background: var(--app-status-out-soft);
-      color: var(--ion-color-danger-shade);
+    .pill[data-status='DISCARDED'] {
+      background: var(--ion-color-light-shade);
+      color: var(--ion-color-medium-shade);
     }
 
-    .pill[data-status='LOW'] {
+    .pill[data-status='PENDING'] {
       background: var(--app-status-low-soft);
       color: var(--ion-color-warning-shade);
     }
 
-    .pill[data-status='OK'] {
+    .pill[data-status='IN_CART'] {
       background: var(--app-status-ok-soft);
       color: var(--ion-color-success-shade);
     }
@@ -43,7 +43,7 @@ import type { StockStatus } from '../../models/pantry.model';
 })
 export class StatusPillComponent {
   /** Status to render. `input()` is the signal-based replacement for `@Input()`. */
-  readonly status = input.required<StockStatus>();
+  readonly status = input.required<ItemStatus>();
 
   protected label(): string {
     return STATUS_META[this.status()].label;

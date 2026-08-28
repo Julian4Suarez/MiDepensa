@@ -28,4 +28,9 @@ export class PantryApiService {
       patch,
     );
   }
+
+  /** Resets every active product to the pending state. */
+  resetActiveItems(slug: string): Observable<void> {
+    return this.http.post<void>(`${this.config.backendUrl}/pantries/${slug}/items/reset`, null);
+  }
 }

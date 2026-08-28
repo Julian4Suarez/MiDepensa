@@ -15,7 +15,7 @@ type createPantryRequest struct {
 // updateItemRequest is the body of PATCH /v1/pantries/:slug/items/:productId.
 // Every field is optional; omitted fields are left untouched.
 type updateItemRequest struct {
-	Status   *entities.StockStatus `json:"status"`
+	Status   *entities.ItemStatus  `json:"status"`
 	Type     *entities.ProductType `json:"type"`
 	Category *entities.Category    `json:"category"`
 }

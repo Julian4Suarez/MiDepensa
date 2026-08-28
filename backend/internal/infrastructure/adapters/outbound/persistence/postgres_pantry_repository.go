@@ -173,6 +173,25 @@ func (r *postgresPantryRepository) UpdateItem(
 	return &item, nil
 }
 
+// ResetActiveItems marks every non-archived pantry item as pending in one query.
+func (r *postgresPantryRepository) ResetActiveItems(
+	ctx context.Context,
+	pantryID uuid.UUID,
+) error {
+	_, err := r.pool.Exec(ctx,
+		`UPDATE pantry_items
+		 SET status = $2, updated_at = now()
+		 WHERE pantry_id = $1 AND status <> $3`,
+		pantryID,
+		entities.StatusPending,
+		entities.StatusArchived,
+	)
+	if err != nil {
+		return fmt.Errorf("persistence: reset active pantry items: %w", err)
+	}
+	return nil
+}
+
 func scanPantryItem(row pgx.Row, pantryID uuid.UUID) (entities.PantryItem, error) {
 	item := entities.PantryItem{PantryID: pantryID}
 	if err := row.Scan(

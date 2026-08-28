@@ -9,19 +9,43 @@
     <ion-icon slot="icon-only" name="ellipsis-horizontal" />
   </ion-button>
 
-  <button
-    type="button"
-    class="body"
-    [attr.aria-label]="
-      item().status === 'ARCHIVED'
-        ? item().product.name + ' is archived'
-        : 'Change stock of ' + item().product.name
-    "
-    [disabled]="item().status === 'ARCHIVED'"
-    (click)="statusToggled.emit(item())"
-  >
+  <div class="body">
     <img class="image" [src]="imageUrl()" [alt]="item().product.name" loading="lazy" />
     <span class="name">{{ item().product.name }}</span>
-    <app-status-pill [status]="item().status" />
-  </button>
+    @if (item().status !== 'PENDING') {
+      <app-status-pill [status]="item().status" />
+    }
+
+    @if (item().status === 'PENDING') {
+      <div class="actions">
+        <ion-button
+          size="small"
+          fill="outline"
+          color="medium"
+          aria-label="Discard product"
+          (click)="changeStatus('DISCARDED')"
+        >
+          <ion-icon slot="icon-only" name="trash-outline" />
+        </ion-button>
+        <ion-button
+          size="small"
+          aria-label="Add product to cart"
+          (click)="changeStatus('IN_CART')"
+        >
+          <ion-icon slot="icon-only" name="cart-outline" />
+        </ion-button>
+      </div>
+    } @else if (item().status === 'DISCARDED' || item().status === 'IN_CART') {
+      <div class="actions single">
+        <ion-button
+          size="small"
+          fill="outline"
+          aria-label="Move product to pending"
+          (click)="changeStatus('PENDING')"
+        >
+          <ion-icon slot="icon-only" name="time-outline" />
+        </ion-button>
+      </div>
+    }
+  </div>
 </div>

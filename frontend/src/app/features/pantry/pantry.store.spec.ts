@@ -9,7 +9,7 @@ function item(
   name: string,
   type: ProductType,
   category: Category,
-  status: PantryItem['status'] = 'OK',
+  status: PantryItem['status'] = 'PENDING',
 ): PantryItem {
   return {
     product: { id: name, code: name, name, image: `${name}.svg` },
@@ -23,18 +23,21 @@ function item(
 describe('PantryStore', () => {
   const items = [
     item('Tomatoes', 'ESSENTIAL', 'FRUIT_VEG'),
-    item('Rice', 'ESSENTIAL', 'DRY_CANNED'),
+    item('Rice', 'ESSENTIAL', 'DRY_CANNED', 'DISCARDED'),
     item('Wine', 'SECONDARY', 'DRINKS', 'ARCHIVED'),
-    item('Dish soap', 'SECONDARY', 'HOME_CARE'),
+    item('Dish soap', 'SECONDARY', 'HOME_CARE', 'IN_CART'),
   ];
 
-  let api: jest.Mocked<Pick<PantryApiService, 'getPantry' | 'updateItem'>>;
+  let api: jest.Mocked<
+    Pick<PantryApiService, 'getPantry' | 'updateItem' | 'resetActiveItems'>
+  >;
   let store: PantryStore;
 
   beforeEach(() => {
     api = {
       getPantry: jest.fn(),
       updateItem: jest.fn(),
+      resetActiveItems: jest.fn(),
     };
 
     TestBed.configureTestingModule({
@@ -57,8 +60,16 @@ describe('PantryStore', () => {
     await store.load('familia');
   }
 
+  it('uses pending as the default shopping-status filter', async () => {
+    await loadPantry();
+
+    expect(store.status()).toBe('PENDING');
+    expect(store.visibleItems().map((i) => i.product.name)).toEqual(['Tomatoes']);
+  });
+
   it('shows only active products for All and only archived products for Archived', async () => {
     await loadPantry();
+    store.status.set('ALL');
 
     expect(store.visibleItems().map((i) => i.product.name)).toEqual(['Tomatoes', 'Rice']);
 
@@ -75,10 +86,41 @@ describe('PantryStore', () => {
 
   it('filters by the selected category inside the type', async () => {
     await loadPantry();
+    store.status.set('ALL');
 
     store.category.set('DRY_CANNED');
 
     expect(store.visibleItems().map((i) => i.product.name)).toEqual(['Rice']);
+  });
+
+  it('filters active products by shopping status', async () => {
+    await loadPantry();
+    store.selectType('ALL');
+
+    store.status.set('IN_CART');
+
+    expect(store.visibleItems().map((i) => i.product.name)).toEqual(['Dish soap']);
+  });
+
+  it('collects every cart product independently of screen filters', async () => {
+    await loadPantry();
+
+    expect(store.cartItems().map((i) => i.product.name)).toEqual(['Dish soap']);
+  });
+
+  it('resets every active product to pending and preserves archived products', async () => {
+    await loadPantry();
+    api.resetActiveItems.mockReturnValue(of(undefined));
+
+    await store.resetActiveItems();
+
+    expect(api.resetActiveItems).toHaveBeenCalledWith('familia');
+    expect(store.items().map((i) => i.status)).toEqual([
+      'PENDING',
+      'PENDING',
+      'ARCHIVED',
+      'PENDING',
+    ]);
   });
 
   it('only offers chips for categories present under the current type', async () => {
@@ -110,32 +152,34 @@ describe('PantryStore', () => {
     expect(store.visibleItems()).toEqual([]);
   });
 
-  it('cycles the status and persists it', async () => {
+  it('changes the shopping status and persists it', async () => {
     await loadPantry();
-    api.updateItem.mockReturnValue(of({ ...items[0], status: 'LOW' }));
+    api.updateItem.mockReturnValue(of({ ...items[0], status: 'IN_CART' }));
 
-    await store.cycleStatus(store.items()[0]);
+    await store.setStatus(store.items()[0], 'IN_CART');
 
-    expect(api.updateItem).toHaveBeenCalledWith('familia', 'Tomatoes', { status: 'LOW' });
-    expect(store.items()[0].status).toBe('LOW');
+    expect(api.updateItem).toHaveBeenCalledWith('familia', 'Tomatoes', {
+      status: 'IN_CART',
+    });
+    expect(store.items()[0].status).toBe('IN_CART');
   });
 
-  it('does not cycle the stock status of an archived product', async () => {
+  it('rejects transitions that skip the pending state', async () => {
     await loadPantry();
 
-    await store.cycleStatus(store.items()[2]);
+    await store.setStatus(store.items()[1], 'IN_CART');
 
     expect(api.updateItem).not.toHaveBeenCalled();
-    expect(store.items()[2].status).toBe('ARCHIVED');
+    expect(store.items()[1].status).toBe('DISCARDED');
   });
 
   it('rolls the optimistic update back when the request fails', async () => {
     await loadPantry();
     api.updateItem.mockReturnValue(throwError(() => new Error('offline')));
 
-    await store.cycleStatus(store.items()[0]);
+    await store.setStatus(store.items()[0], 'DISCARDED');
 
-    expect(store.items()[0].status).toBe('OK');
+    expect(store.items()[0].status).toBe('PENDING');
     expect(store.error()).not.toBeNull();
   });
 });

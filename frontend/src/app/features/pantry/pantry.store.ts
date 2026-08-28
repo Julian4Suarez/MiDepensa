@@ -3,7 +3,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { PantryApiService } from '../../core/services/pantry-api.service';
 import { sortItems } from '../../core/utils/sort-items';
-import { CATEGORIES, NEXT_STATUS } from '../../shared/models/pantry.meta';
+import { CATEGORIES } from '../../shared/models/pantry.meta';
 import {
   ALL,
   ARCHIVED,
@@ -12,7 +12,9 @@ import {
   type ItemPatch,
   type Pantry,
   type PantryItem,
+  type ShoppingStatus,
   type SortMode,
+  type StatusFilter,
   type TypeFilter,
 } from '../../shared/models/pantry.model';
 
@@ -33,8 +35,11 @@ export class PantryStore {
   // Opens on the products bought every time, which is the common case.
   readonly type = signal<TypeFilter>('ESSENTIAL');
   readonly category = signal<CategoryFilter>(ALL);
+  // Pending is the working view: products that still need a decision.
+  readonly status = signal<StatusFilter>('PENDING');
   readonly sort = signal<SortMode>('DEFAULT');
   readonly loading = signal(false);
+  readonly resetting = signal(false);
   readonly error = signal<string | null>(null);
 
   // ── Derived state ─────────────────────────────────────────
@@ -54,13 +59,21 @@ export class PantryStore {
   /** Items shown in the grid: type, then category, then sort order. */
   readonly visibleItems = computed(() => {
     const category = this.category();
-    const filtered =
+    const categoryItems =
       category === ALL
         ? this.itemsOfType()
         : this.itemsOfType().filter((item) => item.category === category);
+    const status = this.status();
+    const filtered =
+      this.type() === ARCHIVED || status === ALL
+        ? categoryItems
+        : categoryItems.filter((item) => item.status === status);
 
     return sortItems(filtered, this.sort());
   });
+
+  /** Every product on the shopping list, regardless of the screen filters. */
+  readonly cartItems = computed(() => this.items().filter((item) => item.status === 'IN_CART'));
 
   /**
    * Only categories present under the current type get a chip, except for the
@@ -97,12 +110,37 @@ export class PantryStore {
     this.type.set(type);
   }
 
-  /** Advances an item to the next stock status. */
-  cycleStatus(item: PantryItem): Promise<void> {
-    if (item.status === ARCHIVED) {
+  /** Moves an item along one of the explicitly allowed shopping transitions. */
+  setStatus(item: PantryItem, status: ShoppingStatus): Promise<void> {
+    const allowed =
+      (item.status === 'PENDING' && (status === 'DISCARDED' || status === 'IN_CART')) ||
+      ((item.status === 'DISCARDED' || item.status === 'IN_CART') && status === 'PENDING');
+    if (!allowed) {
       return Promise.resolve();
     }
-    return this.patch(item, { status: NEXT_STATUS[item.status] });
+    return this.patch(item, { status });
+  }
+
+  /** Resets every active product to pending, preserving archived products. */
+  async resetActiveItems(): Promise<void> {
+    const slug = this.pantry()?.slug;
+    if (!slug || this.resetting()) {
+      return;
+    }
+
+    const previous = this.items();
+    this.resetting.set(true);
+    this.items.update((items) =>
+      items.map((item) => (item.status === ARCHIVED ? item : { ...item, status: 'PENDING' })),
+    );
+    try {
+      await firstValueFrom(this.api.resetActiveItems(slug));
+    } catch {
+      this.items.set(previous);
+      this.error.set('The products could not be reset.');
+    } finally {
+      this.resetting.set(false);
+    }
   }
 
   /** Applies a settings change coming from the item modal. */

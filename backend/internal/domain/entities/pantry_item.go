@@ -14,7 +14,7 @@ var ErrInvalidItemPatch = errors.New("pantry item: patch contains an invalid val
 type PantryItem struct {
 	PantryID  uuid.UUID
 	Product   Product
-	Status    StockStatus
+	Status    ItemStatus
 	Type      ProductType
 	Category  Category
 	UpdatedAt time.Time
@@ -27,7 +27,7 @@ func NewPantryItem(pantryID uuid.UUID, product Product) PantryItem {
 	// Keep hand-built products backwards compatible while requiring persisted
 	// catalog rows to declare their default explicitly.
 	if !status.IsValid() {
-		status = StatusOK
+		status = StatusPending
 	}
 	return PantryItem{
 		PantryID:  pantryID,
@@ -41,7 +41,7 @@ func NewPantryItem(pantryID uuid.UUID, product Product) PantryItem {
 
 // ItemPatch is a partial update of a pantry item; nil fields are left untouched.
 type ItemPatch struct {
-	Status   *StockStatus
+	Status   *ItemStatus
 	Type     *ProductType
 	Category *Category
 }

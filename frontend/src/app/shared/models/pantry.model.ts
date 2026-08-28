@@ -1,5 +1,6 @@
-/** Current stock state, or archived when hidden from active views. */
-export type StockStatus = 'OUT' | 'LOW' | 'OK' | 'ARCHIVED';
+/** Current state in the shopping workflow, or archived when hidden. */
+export type ItemStatus = 'DISCARDED' | 'PENDING' | 'IN_CART' | 'ARCHIVED';
+export type ShoppingStatus = Exclude<ItemStatus, 'ARCHIVED'>;
 
 /** How often a product is bought. The coarse filter of the pantry screen. */
 export type ProductType = 'ESSENTIAL' | 'SECONDARY';
@@ -18,6 +19,7 @@ export const ALL = 'ALL';
 export const ARCHIVED = 'ARCHIVED';
 export type CategoryFilter = Category | typeof ALL;
 export type TypeFilter = ProductType | typeof ALL | typeof ARCHIVED;
+export type StatusFilter = ShoppingStatus | typeof ALL;
 
 /** How the product grid is ordered. */
 export type SortMode = 'DEFAULT' | 'NAME' | 'STATUS';
@@ -34,7 +36,7 @@ export interface Product {
 /** The per-pantry state of a catalog product. */
 export interface PantryItem {
   product: Product;
-  status: StockStatus;
+  status: ItemStatus;
   type: ProductType;
   category: Category;
   updatedAt: string;
@@ -56,7 +58,7 @@ export interface PantryDetail extends Pantry {
 
 /** Partial update of an item; omitted fields are left untouched. */
 export interface ItemPatch {
-  status?: StockStatus;
+  status?: ItemStatus;
   type?: ProductType;
   category?: Category;
 }

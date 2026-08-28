@@ -1,7 +1,7 @@
 import { sortItems } from './sort-items';
-import type { PantryItem, StockStatus } from '../../shared/models/pantry.model';
+import type { ItemStatus, PantryItem } from '../../shared/models/pantry.model';
 
-function item(name: string, status: StockStatus): PantryItem {
+function item(name: string, status: ItemStatus): PantryItem {
   return {
     product: { id: name, code: name, name, image: `${name}.svg` },
     status,
@@ -12,7 +12,11 @@ function item(name: string, status: StockStatus): PantryItem {
 }
 
 describe('sortItems', () => {
-  const items = [item('Tomatoes', 'OK'), item('Apples', 'OUT'), item('Milk', 'LOW')];
+  const items = [
+    item('Tomatoes', 'DISCARDED'),
+    item('Apples', 'IN_CART'),
+    item('Milk', 'PENDING'),
+  ];
 
   it('keeps the catalog order by default', () => {
     expect(sortItems(items, 'DEFAULT')).toBe(items);
@@ -26,12 +30,16 @@ describe('sortItems', () => {
     ]);
   });
 
-  it('sorts by stock level, most urgent first', () => {
-    expect(sortItems(items, 'STATUS').map((i) => i.status)).toEqual(['OUT', 'LOW', 'OK']);
+  it('sorts by shopping status, pending decisions first', () => {
+    expect(sortItems(items, 'STATUS').map((i) => i.status)).toEqual([
+      'PENDING',
+      'IN_CART',
+      'DISCARDED',
+    ]);
   });
 
-  it('keeps the catalog order within the same stock level', () => {
-    const sameStatus = [item('Zucchini', 'OUT'), item('Apples', 'OUT')];
+  it('keeps the catalog order within the same shopping status', () => {
+    const sameStatus = [item('Zucchini', 'IN_CART'), item('Apples', 'IN_CART')];
 
     expect(sortItems(sameStatus, 'STATUS').map((i) => i.product.name)).toEqual([
       'Zucchini',

@@ -1,26 +1,26 @@
 package entities
 
-// StockStatus is the current stock state, or archived when removed from active views.
-type StockStatus string
+// ItemStatus is the product's state in the shopping workflow.
+type ItemStatus string
 
 const (
-	// StatusOut means the product must be bought (rendered red).
-	StatusOut StockStatus = "OUT"
-	// StatusLow means the product is running low (rendered amber).
-	StatusLow StockStatus = "LOW"
-	// StatusOK means there is enough of the product (rendered green).
-	StatusOK StockStatus = "OK"
+	// StatusDiscarded means the product is not needed on this shopping trip.
+	StatusDiscarded ItemStatus = "DISCARDED"
+	// StatusPending means the product still needs a decision.
+	StatusPending ItemStatus = "PENDING"
+	// StatusInCart means the product belongs on the shopping list.
+	StatusInCart ItemStatus = "IN_CART"
 	// StatusArchived removes the product from the active pantry views.
-	StatusArchived StockStatus = "ARCHIVED"
+	StatusArchived ItemStatus = "ARCHIVED"
 )
 
-// StockStatuses lists every stock status in display order.
-var StockStatuses = []StockStatus{StatusOut, StatusLow, StatusOK, StatusArchived}
+// ItemStatuses lists every item status in display order.
+var ItemStatuses = []ItemStatus{StatusDiscarded, StatusPending, StatusInCart, StatusArchived}
 
 // IsValid reports whether the status is one of the known values.
-func (s StockStatus) IsValid() bool {
+func (s ItemStatus) IsValid() bool {
 	switch s {
-	case StatusOut, StatusLow, StatusOK, StatusArchived:
+	case StatusDiscarded, StatusPending, StatusInCart, StatusArchived:
 		return true
 	default:
 		return false

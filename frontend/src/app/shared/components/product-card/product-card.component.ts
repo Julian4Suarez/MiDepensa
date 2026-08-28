@@ -1,14 +1,19 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { IonButton, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { ellipsisHorizontal } from 'ionicons/icons';
+import { cartOutline, ellipsisHorizontal, timeOutline, trashOutline } from 'ionicons/icons';
 
 import { StatusPillComponent } from '../status-pill/status-pill.component';
-import type { PantryItem } from '../../models/pantry.model';
+import type { PantryItem, ShoppingStatus } from '../../models/pantry.model';
+
+export interface StatusChange {
+  item: PantryItem;
+  status: ShoppingStatus;
+}
 
 /**
- * One product in the pantry grid: image, name, status pill and a settings
- * button. Tapping the card cycles the status; the button opens the settings.
+ * One product in the pantry grid: image, name, status pill, settings button and
+ * the valid actions for its current shopping state.
  */
 @Component({
   selector: 'app-product-card',
@@ -21,8 +26,8 @@ import type { PantryItem } from '../../models/pantry.model';
 export class ProductCardComponent {
   readonly item = input.required<PantryItem>();
 
-  /** Emitted when the user taps the card to change the stock status. */
-  readonly statusToggled = output<PantryItem>();
+  /** Emitted when the user chooses one of the allowed shopping transitions. */
+  readonly statusChanged = output<StatusChange>();
 
   /** Emitted when the user opens the item settings. */
   readonly settingsOpened = output<PantryItem>();
@@ -30,10 +35,14 @@ export class ProductCardComponent {
   constructor() {
     // Standalone Ionic requires every icon to be registered explicitly, which
     // keeps unused icons out of the bundle.
-    addIcons({ ellipsisHorizontal });
+    addIcons({ cartOutline, ellipsisHorizontal, timeOutline, trashOutline });
   }
 
   protected imageUrl(): string {
     return `assets/products/${this.item().product.image}`;
+  }
+
+  protected changeStatus(status: ShoppingStatus): void {
+    this.statusChanged.emit({ item: this.item(), status });
   }
 }

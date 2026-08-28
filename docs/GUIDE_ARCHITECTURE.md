@@ -4,18 +4,18 @@
 
 A **pantry** is a named collection reachable at `/pantries/{slug}`. Every pantry
 holds one **item** per catalog **product**. An item carries three pieces of
-state: how much is left (**status**), how often you buy it (**type**), and what
-kind of product it is (**category**). The catalog itself is global, read-only
-and seeded by a migration.
+state: its place in the shopping workflow (**status**), how often you buy it
+(**type**), and what kind of product it is (**category**). The catalog itself
+is global, read-only and seeded by a migration.
 
 ```
 Pantry 1 ──── * PantryItem * ──── 1 Product
-"familia-suarez"   OUT / ESSENTIAL / FRUIT_VEG   "tomato"
+"familia-suarez"   PENDING / ESSENTIAL / FRUIT_VEG   "tomato"
 ```
 
 | Enum | Values |
 | --- | --- |
-| `StockStatus` | `OUT` (red), `LOW` (amber), `OK` (green), `ARCHIVED` |
+| `ItemStatus` | `DISCARDED`, `PENDING`, `IN_CART`, `ARCHIVED` |
 | `ProductType` | `ESSENTIAL`, `SECONDARY` |
 | `Category` | `FRUIT_VEG`, `MEAT_FISH`, `DAIRY_EGGS`, `DRY_CANNED`, `DRINKS`, `HOME_CARE` |
 
@@ -24,6 +24,13 @@ archived state; its All option includes only active essential and secondary
 products. Type answers *how often do I buy this*, while category mirrors
 **supermarket aisles**, because the generated shopping list is grouped by
 category and should follow the route you walk through the shop.
+
+The status filter is opened from the toolbar and defaults to `PENDING`. A pending product can be
+discarded or placed in the cart; discarded and cart products can return to
+pending. The generated shopping list contains every `IN_CART` product and is
+independent of the screen filters.
+New pantries start with every active product in `PENDING`; the toolbar reset
+action restores that state in one bulk request without changing archived items.
 
 Two earlier designs were replaced:
 
@@ -126,6 +133,7 @@ Base path `/v1`.
 | `POST` | `/v1/pantries` | `{ "name": "Familia Suárez" }` → 201 with the slug |
 | `GET` | `/v1/pantries/{slug}` | Pantry with all items |
 | `PATCH` | `/v1/pantries/{slug}/items/{productId}` | `{ status?, type?, category? }` |
+| `POST` | `/v1/pantries/{slug}/items/reset` | Reset every active item to `PENDING` |
 
 Creating a pantry inserts the pantry row and all 57 item rows in one
 transaction; a slug collision rolls the whole thing back and returns `409`. The

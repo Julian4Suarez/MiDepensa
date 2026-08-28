@@ -96,7 +96,7 @@ export class ItemSettingsModalComponent {
 
   protected toggleArchived(): void {
     void this.modals.dismiss({
-      status: this.item.status === ARCHIVED ? 'OK' : ARCHIVED,
+      status: this.item.status === ARCHIVED ? 'PENDING' : ARCHIVED,
     } satisfies ItemPatch);
   }
 }

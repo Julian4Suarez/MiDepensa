@@ -91,11 +91,11 @@ func TestPantryRepository_UpdateItem_AppliesOnlyProvidedFields(t *testing.T) {
 		_, _ = pool.Exec(ctx, `DELETE FROM pantries WHERE id = $1`, pantry.ID)
 	})
 
-	status := entities.StatusOut
+	status := entities.StatusInCart
 	updated, err := pantryRepository.UpdateItem(ctx, pantry.ID, product.ID, entities.ItemPatch{Status: &status})
 
 	require.NoError(t, err)
-	assert.Equal(t, entities.StatusOut, updated.Status)
+	assert.Equal(t, entities.StatusInCart, updated.Status)
 	assert.Equal(t, original.Type, updated.Type, "type must be untouched")
 	assert.Equal(t, original.Category, updated.Category, "category must be untouched")
 	assert.Equal(t, product.Code, updated.Product.Code)
@@ -106,7 +106,7 @@ func TestPantryRepository_UpdateItem_WithUnknownProduct_ReturnsErrNotFound(t *te
 	pool := newPool(t)
 	repository := persistence.NewPostgresPantryRepository(pool)
 
-	status := entities.StatusLow
+	status := entities.StatusPending
 
 	_, err := repository.UpdateItem(ctx, uuid.New(), uuid.New(), entities.ItemPatch{Status: &status})
 

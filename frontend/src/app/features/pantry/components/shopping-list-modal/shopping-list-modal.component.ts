@@ -1,8 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import {
   IonButton,
   IonButtons,
-  IonCheckbox,
   IonContent,
   IonHeader,
   IonIcon,
@@ -25,7 +24,6 @@ import type { PantryItem } from '../../../../shared/models/pantry.model';
   imports: [
     IonButton,
     IonButtons,
-    IonCheckbox,
     IonContent,
     IonHeader,
     IonIcon,
@@ -40,16 +38,14 @@ export class ShoppingListModalComponent {
   private readonly toasts = inject(ToastController);
 
   /**
-   * The products currently visible on the pantry screen, assigned through
-   * `componentProps`, so the list matches whatever the filters show.
+   * Products currently in the cart, assigned through `componentProps`.
    *
    * A plain property, not `input()`: ModalController assigns componentProps
    * straight onto the instance, which would overwrite an InputSignal.
    */
   items: PantryItem[] = [];
 
-  protected readonly includeLow = signal(false);
-  protected readonly text = computed(() => buildShoppingList(this.items, this.includeLow()));
+  protected readonly text = computed(() => buildShoppingList(this.items));
 
   constructor() {
     addIcons({ closeOutline, copyOutline });

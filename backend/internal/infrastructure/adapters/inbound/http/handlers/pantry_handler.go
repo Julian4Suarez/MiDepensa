@@ -88,6 +88,19 @@ func (h *PantryHandler) UpdateItem(c *gin.Context) {
 	c.JSON(http.StatusOK, toItemResponse(*item))
 }
 
+// ResetActiveItems handles POST /v1/pantries/:slug/items/reset.
+func (h *PantryHandler) ResetActiveItems(c *gin.Context) {
+	slug, ok := parseSlug(c)
+	if !ok {
+		return
+	}
+	if err := h.service.ResetActiveItems(c.Request.Context(), slug); err != nil {
+		helpers.Respond(c, err)
+		return
+	}
+	c.Status(http.StatusNoContent)
+}
+
 // parseSlug validates the :slug path parameter, responding with 400 when it is
 // not a well-formed slug so malformed input never reaches the database.
 func parseSlug(c *gin.Context) (valueobjects.Slug, bool) {

@@ -37,7 +37,7 @@ func TestNewPantryItem_TakesCategoryAndTypeFromCatalogDefaults(t *testing.T) {
 	item := entities.NewPantryItem(pantryID, product)
 
 	assert.Equal(t, pantryID, item.PantryID)
-	assert.Equal(t, entities.StatusOK, item.Status)
+	assert.Equal(t, entities.StatusPending, item.Status)
 	assert.Equal(t, entities.CategoryFruitVeg, item.Category)
 	assert.Equal(t, entities.TypeEssential, item.Type)
 }
@@ -57,7 +57,7 @@ func TestNewPantryItem_TakesArchivedStatusFromCatalogDefault(t *testing.T) {
 }
 
 func TestItemPatch_Validate_RejectsUnknownEnumValues(t *testing.T) {
-	unknownStatus := entities.StockStatus("SOLD_OUT")
+	unknownStatus := entities.ItemStatus("UNKNOWN")
 	unknownType := entities.ProductType("FAVOURITES")
 	unknownCategory := entities.Category("PETS")
 
@@ -68,21 +68,21 @@ func TestItemPatch_Validate_RejectsUnknownEnumValues(t *testing.T) {
 
 func TestItemPatch_Apply_OnlyChangesProvidedFields(t *testing.T) {
 	item := entities.PantryItem{
-		Status:   entities.StatusOK,
+		Status:   entities.StatusDiscarded,
 		Type:     entities.TypeEssential,
 		Category: entities.CategoryFruitVeg,
 	}
-	status := entities.StatusOut
+	status := entities.StatusInCart
 
 	item.Apply(entities.ItemPatch{Status: &status})
 
-	assert.Equal(t, entities.StatusOut, item.Status)
+	assert.Equal(t, entities.StatusInCart, item.Status)
 	assert.Equal(t, entities.TypeEssential, item.Type)
 	assert.Equal(t, entities.CategoryFruitVeg, item.Category)
 }
 
 func TestItemPatch_IsEmpty_ReportsWhetherAnythingWouldChange(t *testing.T) {
-	status := entities.StatusLow
+	status := entities.StatusPending
 
 	assert.True(t, entities.ItemPatch{}.IsEmpty())
 	assert.False(t, entities.ItemPatch{Status: &status}.IsEmpty())

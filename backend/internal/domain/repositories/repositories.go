@@ -17,7 +17,7 @@ var ErrNotFound = errors.New("repository: resource not found")
 // ErrSlugTaken is returned when a pantry slug collides with an existing one.
 var ErrSlugTaken = errors.New("repository: slug already taken")
 
-// PantryRepository persists pantries and their per-product stock levels.
+// PantryRepository persists pantries and their per-product state.
 type PantryRepository interface {
 	// Create stores the pantry together with its initial items atomically.
 	// It returns ErrSlugTaken when the slug is already in use.
@@ -36,6 +36,9 @@ type PantryRepository interface {
 		productID uuid.UUID,
 		patch entities.ItemPatch,
 	) (*entities.PantryItem, error)
+
+	// ResetActiveItems marks every non-archived item as pending.
+	ResetActiveItems(ctx context.Context, pantryID uuid.UUID) error
 }
 
 // ProductRepository reads the seeded catalog.

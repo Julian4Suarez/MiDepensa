@@ -10,13 +10,12 @@
     transform 120ms ease;
 }
 
-.card[data-status='OUT'] {
-  border-color: var(--ion-color-danger);
-  background: var(--app-status-out-surface);
+.card[data-status='PENDING'] {
+  border-color: var(--ion-color-warning);
 }
 
-.card[data-status='LOW'] {
-  border-color: var(--ion-color-warning);
+.card[data-status='IN_CART'] {
+  border-color: var(--ion-color-success);
 }
 
 .card[data-status='ARCHIVED'] {
@@ -48,13 +47,28 @@
   padding: 18px 10px 14px;
   background: none;
   border: none;
-  cursor: pointer;
   font: inherit;
   color: inherit;
 }
 
-.body:disabled {
-  cursor: default;
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.actions.single {
+  justify-content: center;
+}
+
+.actions ion-button {
+  width: 42px;
+  height: 42px;
+  min-height: 42px;
+  margin: 0;
+  --padding-start: 0;
+  --padding-end: 0;
 }
 
 .image {

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, type OnInit, computed, inject, inpu
 import { RouterLink } from '@angular/router';
 import {
   ActionSheetController,
+  AlertController,
   IonButton,
   IonButtons,
   IonContent,
@@ -20,9 +21,11 @@ import {
   cartOutline,
   eggOutline,
   fileTrayStackedOutline,
+  filterOutline,
   fishOutline,
   homeOutline,
   nutritionOutline,
+  refreshOutline,
   sparklesOutline,
   starOutline,
   swapVerticalOutline,
@@ -39,6 +42,8 @@ import {
   CATEGORY_META,
   SORT_META,
   SORT_MODES,
+  SHOPPING_STATUSES,
+  STATUS_META,
   TYPES,
   TYPE_META,
 } from '../../../../shared/models/pantry.meta';
@@ -53,7 +58,7 @@ import { ItemSettingsModalComponent } from '../../components/item-settings-modal
 import { ShoppingListModalComponent } from '../../components/shopping-list-modal/shopping-list-modal.component';
 import { PantryStore } from '../../pantry.store';
 
-/** The pantry screen: two filter bars and the product grid. */
+/** The pantry screen: toolbar controls, two filter bars and the product grid. */
 @Component({
   selector: 'app-pantry',
   standalone: true,
@@ -80,6 +85,7 @@ export class PantryPage implements OnInit {
   protected readonly store = inject(PantryStore);
   private readonly modals = inject(ModalController);
   private readonly actionSheets = inject(ActionSheetController);
+  private readonly alerts = inject(AlertController);
 
   protected readonly sortMeta = SORT_META;
 
@@ -108,9 +114,11 @@ export class PantryPage implements OnInit {
       bookmarkOutline,
       archiveOutline,
       nutritionOutline,
+      refreshOutline,
       fishOutline,
       eggOutline,
       fileTrayStackedOutline,
+      filterOutline,
       wineOutline,
       sparklesOutline,
       appsOutline,
@@ -148,6 +156,42 @@ export class PantryPage implements OnInit {
     await sheet.present();
   }
 
+  protected async openStatusFilter(): Promise<void> {
+    const sheet = await this.actionSheets.create({
+      header: 'Filter by status',
+      buttons: [
+        {
+          text: 'All statuses',
+          role: this.store.status() === ALL ? 'selected' : undefined,
+          handler: () => this.store.status.set(ALL),
+        },
+        ...SHOPPING_STATUSES.map((status) => ({
+          text: STATUS_META[status].label,
+          role: this.store.status() === status ? 'selected' : undefined,
+          handler: () => this.store.status.set(status),
+        })),
+        { text: 'Cancel', role: 'cancel' },
+      ],
+    });
+    await sheet.present();
+  }
+
+  protected async confirmReset(): Promise<void> {
+    const alert = await this.alerts.create({
+      header: 'Reset products?',
+      message: 'Every active product will return to pending. Archived products will not change.',
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Reset',
+          role: 'confirm',
+          handler: () => void this.store.resetActiveItems(),
+        },
+      ],
+    });
+    await alert.present();
+  }
+
   protected async openSettings(item: PantryItem): Promise<void> {
     const modal = await this.modals.create({
       component: ItemSettingsModalComponent,
@@ -166,7 +210,7 @@ export class PantryPage implements OnInit {
   protected async openShoppingList(): Promise<void> {
     const modal = await this.modals.create({
       component: ShoppingListModalComponent,
-      componentProps: { items: this.store.visibleItems() },
+      componentProps: { items: this.store.cartItems() },
       breakpoints: [0, 0.9],
       initialBreakpoint: 0.9,
     });

@@ -10,6 +10,22 @@
 
     <ion-buttons slot="end">
       <ion-button
+        (click)="confirmReset()"
+        [disabled]="store.resetting()"
+        aria-label="Reset all active products to pending"
+      >
+        <ion-icon slot="icon-only" name="refresh-outline" />
+      </ion-button>
+      <ion-button
+        (click)="openStatusFilter()"
+        [color]="store.status() === 'ALL' ? undefined : 'primary'"
+        [attr.aria-label]="
+          store.status() === 'ALL' ? 'Filter by status' : 'Status: ' + store.status()
+        "
+      >
+        <ion-icon slot="icon-only" name="filter-outline" />
+      </ion-button>
+      <ion-button
         (click)="openSort()"
         [attr.aria-label]="'Sort by ' + sortMeta[store.sort()].label"
       >
@@ -21,7 +37,7 @@
     </ion-buttons>
   </ion-toolbar>
 
-  <!-- Two independent axes: how often you buy it, and which aisle it is in. -->
+  <!-- Type and aisle filters stay visible; shopping status lives in the toolbar. -->
   <app-filter-bar
     label="Filter by type"
     [options]="typeOptions"
@@ -51,7 +67,7 @@
       @for (item of store.visibleItems(); track item.product.id) {
         <app-product-card
           [item]="item"
-          (statusToggled)="store.cycleStatus($event)"
+          (statusChanged)="store.setStatus($event.item, $event.status)"
           (settingsOpened)="openSettings($event)"
         />
       }

@@ -52,6 +52,7 @@ func SetupRouter(
 		v1.GET("/catalog", catalog.Get)
 		v1.POST("/pantries", pantries.Create)
 		v1.GET("/pantries/:slug", pantries.Get)
+		v1.POST("/pantries/:slug/items/reset", pantries.ResetActiveItems)
 		v1.PATCH("/pantries/:slug/items/:productId", pantries.UpdateItem)
 	}
 
