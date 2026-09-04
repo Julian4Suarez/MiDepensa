@@ -1,7 +1,12 @@
 # Catálogo ampliado de productos
 
+> Documento histórico de la ampliación inicial. Las categorías actuales se
+> definen en la migración `000011_rework_categories` y la consolidación en
+> productos generales con subtipos en `000012_consolidate_catalog`.
+
 Este documento recoge el catálogo original y la ampliación implementada en la
-migración `000005_expand_catalog`. El catálogo completo contiene 183 productos.
+migración `000005_expand_catalog`. En ese momento el catálogo contenía 183
+productos; las migraciones posteriores agrupan los duplicados como subtipos.
 
 ## Cómo leer y editar la propuesta
 

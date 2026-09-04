@@ -156,3 +156,78 @@ func TestPantryRepository_UpdateItem_PersistsSelectedVariants(t *testing.T) {
 	assert.Empty(t, updated.SelectedVariantIDs)
 	assert.Equal(t, entities.StatusInCart, updated.Status)
 }
+
+func TestCatalog_UsesConsolidatedProductsAndVariants(t *testing.T) {
+	ctx := context.Background()
+	productRepository := persistence.NewPostgresProductRepository(newPool(t))
+
+	catalog, err := productRepository.List(ctx)
+	require.NoError(t, err)
+
+	byCode := make(map[string]entities.Product, len(catalog))
+	for _, product := range catalog {
+		byCode[product.Code] = product
+	}
+
+	for _, removed := range []string{
+		"canned_food", "canned_peas", "canned_tuna", "canned_sardines",
+		"frozen_vegetables", "margarine", "egg_whites", "napkins", "tissues",
+		"toilet_paper",
+	} {
+		_, exists := byCode[removed]
+		assert.False(t, exists, "%s should not remain an independent product", removed)
+	}
+
+	expectedVariants := map[string][]string{
+		"chicken":              {"Whole chicken", "Chicken breast", "Chicken thighs", "Chicken wings"},
+		"fish":                 {"White fish", "Salmon", "Hake", "Tuna", "Sardines", "Prawns"},
+		"leafy_greens":         {"Mixed greens", "Lettuce", "Spinach"},
+		"onion":                {"Yellow onion", "Red onion", "Sweet onion", "Leek"},
+		"potato":               {"White potato", "Red potato", "Sweet potato"},
+		"bell_pepper":          {"Green pepper", "Red pepper", "Yellow pepper"},
+		"tomato":               {"Cherry tomatoes", "Roma tomatoes", "Beefsteak tomatoes", "Vine tomatoes"},
+		"beans":                {"White beans", "Lentils", "Chickpeas", "Black beans", "Kidney beans"},
+		"butter":               {"Salted butter", "Unsalted butter", "Ghee"},
+		"cereal":               {"Corn flakes", "Oats", "Muesli", "Granola"},
+		"spices":               {"Black pepper", "Paprika", "Oregano", "Cumin", "Cinnamon", "Curry powder"},
+		"aluminium_foil":       {"Aluminium foil", "Cling film", "Baking paper"},
+		"laundry_detergent":    {"Laundry detergent", "Fabric softener", "Stain remover", "Bleach"},
+		"multipurpose_cleaner": {"Multipurpose cleaner", "Disinfectant", "Toilet cleaner", "Floor cleaner", "Glass cleaner", "Degreaser"},
+		"dish_soap":            {"Dish soap", "Dishwasher tablets", "Dishwasher salt"},
+		"sponges":              {"Sponges", "Dishcloths", "Rubber gloves"},
+		"paper_towels":         {"Kitchen roll", "Napkins", "Tissues", "Toilet paper"},
+		"hand_soap":            {"Hand soap", "Shower gel", "Shampoo", "Conditioner"},
+	}
+	for code, expected := range expectedVariants {
+		product, exists := byCode[code]
+		require.True(t, exists, "%s should be in the catalog", code)
+		names := make([]string, 0, len(product.Variants))
+		for _, variant := range product.Variants {
+			names = append(names, variant.Name)
+		}
+		assert.Equal(t, expected, names, "unexpected variants for %s", code)
+	}
+
+	assert.Equal(t, "Beef", byCode["red_meat"].Name)
+	assert.Equal(t, "Cold cuts", byCode["cooked_ham"].Name)
+	assert.Equal(t, "Cilantro", byCode["coriander"].Name)
+	assert.Equal(t, "Paper products", byCode["paper_towels"].Name)
+	assert.Equal(t, entities.TypeEssential, byCode["avocado"].DefaultType)
+	assert.Equal(t, entities.TypeEssential, byCode["orange"].DefaultType)
+	assert.Equal(t, entities.TypeEssential, byCode["lemon"].DefaultType)
+	assert.Equal(t, entities.CategoryDairyEggs, byCode["cream"].DefaultCategory)
+	assert.Equal(t, entities.StatusPending, byCode["honey"].DefaultStatus)
+	assert.Equal(t, entities.StatusPending, byCode["mustard"].DefaultStatus)
+	assert.Equal(t, entities.StatusPending, byCode["grapes"].DefaultStatus)
+	assert.Equal(t, entities.StatusPending, byCode["cucumber"].DefaultStatus)
+	assert.Equal(t, entities.StatusPending, byCode["spices"].DefaultStatus)
+	assert.Equal(t, entities.StatusArchived, byCode["cherries"].DefaultStatus)
+	assert.Equal(t, entities.StatusArchived, byCode["raspberries"].DefaultStatus)
+	assert.Equal(t, entities.StatusArchived, byCode["green_beans"].DefaultStatus)
+	assert.Equal(t, entities.StatusArchived, byCode["bacon"].DefaultStatus)
+	assert.Equal(t, entities.StatusArchived, byCode["turkey"].DefaultStatus)
+	assert.Equal(t, entities.StatusArchived, byCode["tofu"].DefaultStatus)
+	assert.Equal(t, entities.StatusArchived, byCode["mouthwash"].DefaultStatus)
+	assert.Equal(t, entities.StatusArchived, byCode["breadcrumbs"].DefaultStatus)
+	assert.Equal(t, entities.StatusArchived, byCode["tomato_sauce"].DefaultStatus)
+}

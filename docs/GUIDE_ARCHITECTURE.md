@@ -39,6 +39,10 @@ the top-left of their card. Its `×N` badge shows the number selected. Variant
 selection is independent from adding the product to the cart and is retained
 when the parent returns to pending. With selections, the shopping list prints
 their concrete names; without selections, it prints the general product name.
+Migration `000012` applies this model consistently to meat cuts, produce,
+breakfast foods, cleaning supplies and personal care. These groups remain
+products and variants inside the existing ten categories; they do not create
+additional categories.
 
 Earlier category designs were replaced:
 
