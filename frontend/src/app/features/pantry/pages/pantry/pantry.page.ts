@@ -227,8 +227,6 @@ export class PantryPage implements OnInit {
     const modal = await this.modals.create({
       component: VariantSelectorModalComponent,
       componentProps: { item },
-      breakpoints: [0, 0.7],
-      initialBreakpoint: 0.7,
     });
     await modal.present();
     const { data } = await modal.onWillDismiss();

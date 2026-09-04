@@ -16,5 +16,11 @@ ion-checkbox {
 }
 
 .confirm {
-  margin: 20px 16px 16px;
+  margin: 8px 16px calc(8px + var(--ion-safe-area-bottom, 0px));
+}
+
+ion-footer ion-toolbar {
+  --border-width: 1px 0 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
 }

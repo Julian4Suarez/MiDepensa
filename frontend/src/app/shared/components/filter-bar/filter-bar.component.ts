@@ -28,4 +28,14 @@ export class FilterBarComponent {
   readonly selected = input.required<string>();
   readonly label = input.required<string>();
   readonly selectedChange = output<string>();
+
+  /** Makes a regular desktop mouse wheel useful on the horizontal chip row. */
+  protected scrollWithWheel(event: WheelEvent, bar: HTMLElement): void {
+    if (bar.scrollWidth <= bar.clientWidth || Math.abs(event.deltaX) >= Math.abs(event.deltaY)) {
+      return;
+    }
+
+    bar.scrollLeft += event.deltaY;
+    event.preventDefault();
+  }
 }
