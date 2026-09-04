@@ -17,6 +17,7 @@ import { addIcons } from 'ionicons';
 import { closeOutline } from 'ionicons/icons';
 
 import type { ItemPatch, PantryItem } from '../../../../shared/models/pantry.model';
+import { productImageUrl } from '../../../../shared/utils/product-image-url';
 
 /** Selects one or more concrete variants before adding a general product. */
 @Component({
@@ -44,6 +45,7 @@ export class VariantSelectorModalComponent implements OnInit {
 
   item!: PantryItem;
   protected readonly selected = signal<Set<string>>(new Set());
+  protected readonly imageUrl = productImageUrl;
 
   constructor() {
     addIcons({ closeOutline });

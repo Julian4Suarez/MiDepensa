@@ -11,6 +11,7 @@ import {
 
 import { StatusPillComponent } from '../status-pill/status-pill.component';
 import type { PantryItem, ShoppingStatus } from '../../models/pantry.model';
+import { productImageUrl } from '../../utils/product-image-url';
 
 export interface StatusChange {
   item: PantryItem;
@@ -48,7 +49,7 @@ export class ProductCardComponent {
   }
 
   protected imageUrl(): string {
-    return `assets/products/${this.item().product.image}`;
+    return productImageUrl(this.item().product.image);
   }
 
   protected changeStatus(status: ShoppingStatus): void {

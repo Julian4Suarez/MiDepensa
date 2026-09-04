@@ -68,6 +68,10 @@ $EDITOR .env.staging             # replace the CHANGE_ME values
 Remote environments never build: they **pull** the image references pinned in
 `environments/<env>.manifest.env`. Promoting to production means copying the
 verified references from `staging.manifest.env` into `production.manifest.env`.
+Copying or pulling the source repository on a server is therefore not enough to
+update the application: publish a new frontend/backend image, update the
+manifest to that immutable image reference, rebuild `.env.<environment>` and
+deploy it.
 
 ## Scripts
 
