@@ -238,6 +238,7 @@ export class PantryPage implements OnInit {
   protected async openShoppingList(): Promise<void> {
     const modal = await this.modals.create({
       component: ShoppingListModalComponent,
+      cssClass: 'shopping-list-modal',
       componentProps: { items: this.store.cartItems() },
     });
     await modal.present();
