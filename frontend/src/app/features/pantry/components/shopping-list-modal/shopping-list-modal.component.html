@@ -17,13 +17,11 @@
   }
 </ion-content>
 
-@if (text()) {
-  <ion-footer>
-    <ion-toolbar>
-      <ion-button expand="block" class="copy" (click)="copy()">
-        <ion-icon slot="start" name="copy-outline" />
-        Copy
-      </ion-button>
-    </ion-toolbar>
-  </ion-footer>
-}
+<ion-footer>
+  <ion-toolbar>
+    <ion-button expand="block" class="copy" [disabled]="!text()" (click)="copy()">
+      <ion-icon slot="start" name="copy-outline" />
+      Copy
+    </ion-button>
+  </ion-toolbar>
+</ion-footer>

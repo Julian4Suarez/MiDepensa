@@ -24,20 +24,3 @@ ion-footer ion-toolbar {
   padding: 48px 24px;
   text-align: center;
 }
-:host {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
-}
-
-ion-header,
-ion-footer {
-  flex-shrink: 0;
-}
-
-ion-content {
-  flex: 1;
-  min-height: 0;
-}
