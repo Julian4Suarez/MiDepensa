@@ -221,6 +221,15 @@ func TestCatalog_UsesConsolidatedProductsAndVariants(t *testing.T) {
 	assert.Equal(t, entities.StatusPending, byCode["grapes"].DefaultStatus)
 	assert.Equal(t, entities.StatusPending, byCode["cucumber"].DefaultStatus)
 	assert.Equal(t, entities.StatusPending, byCode["spices"].DefaultStatus)
+	for _, code := range []string{"cassava", "plantain", "beetroot"} {
+		product, exists := byCode[code]
+		require.True(t, exists, "%s should be in the catalog", code)
+		assert.Equal(t, entities.TypeSecondary, product.DefaultType)
+		assert.Equal(t, entities.StatusPending, product.DefaultStatus)
+	}
+	assert.Equal(t, entities.CategoryVegetables, byCode["cassava"].DefaultCategory)
+	assert.Equal(t, entities.CategoryFruit, byCode["plantain"].DefaultCategory)
+	assert.Equal(t, entities.CategoryVegetables, byCode["beetroot"].DefaultCategory)
 	assert.Equal(t, entities.StatusArchived, byCode["cherries"].DefaultStatus)
 	assert.Equal(t, entities.StatusArchived, byCode["raspberries"].DefaultStatus)
 	assert.Equal(t, entities.StatusArchived, byCode["green_beans"].DefaultStatus)

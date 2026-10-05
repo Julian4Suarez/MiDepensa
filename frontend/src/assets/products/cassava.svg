@@ -1,0 +1,14 @@
+<svg id="emoji" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
+  <g id="color" stroke="none">
+    <path fill="#6A9C3B" d="M37 19c-7-1-12-5-14-11 7-1 13 3 16 9 0-7 4-12 10-15 3 7 1 14-6 19 7-2 13 0 17 5-6 5-13 4-19-1z"/>
+    <path fill="#9B6337" d="M35 20c5-2 10 1 11 6l7 29c1 5-2 10-7 11-5 1-9-2-10-7l-7-30c-1-4 1-8 6-9z"/>
+    <path fill="#B97842" d="M32 29c4 1 9 0 14-3l2 8c-5 3-10 4-14 3zm4 16c4 1 9 0 14-3l2 8c-5 3-10 4-14 3z"/>
+    <ellipse cx="45" cy="61" rx="7" ry="5" fill="#F4E4BF" transform="rotate(-14 45 61)"/>
+  </g>
+  <g id="line" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+    <path d="M38 20c-8-1-13-5-15-12 7-1 13 3 16 9 0-7 4-12 10-15 3 7 1 14-6 19 7-2 13 0 17 5-6 5-13 4-19-1"/>
+    <path d="M35 20c5-2 10 1 11 6l7 29c1 5-2 10-7 11-5 1-9-2-10-7l-7-30c-1-4 1-8 6-9z"/>
+    <path d="M32 29c4 1 9 0 14-3M35 37c4 1 9 0 14-3M36 45c4 1 9 0 14-3M38 53c4 1 9 0 14-3"/>
+    <ellipse cx="45" cy="61" rx="7" ry="5" transform="rotate(-14 45 61)"/>
+  </g>
+</svg>
