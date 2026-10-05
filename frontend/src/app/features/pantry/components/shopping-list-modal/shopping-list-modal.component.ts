@@ -3,6 +3,7 @@ import {
   IonButton,
   IonButtons,
   IonContent,
+  IonFooter,
   IonHeader,
   IonIcon,
   IonTitle,
@@ -16,7 +17,7 @@ import { closeOutline, copyOutline } from 'ionicons/icons';
 import { buildShoppingList } from '../../../../core/utils/shopping-list';
 import type { PantryItem } from '../../../../shared/models/pantry.model';
 
-/** Bottom sheet that renders the shopping list and copies it to the clipboard. */
+/** Modal that renders the shopping list and copies it to the clipboard. */
 @Component({
   selector: 'app-shopping-list-modal',
   standalone: true,
@@ -25,6 +26,7 @@ import type { PantryItem } from '../../../../shared/models/pantry.model';
     IonButton,
     IonButtons,
     IonContent,
+    IonFooter,
     IonHeader,
     IonIcon,
     IonTitle,

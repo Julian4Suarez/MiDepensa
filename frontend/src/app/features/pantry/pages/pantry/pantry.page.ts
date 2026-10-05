@@ -239,8 +239,6 @@ export class PantryPage implements OnInit {
     const modal = await this.modals.create({
       component: ShoppingListModalComponent,
       componentProps: { items: this.store.cartItems() },
-      breakpoints: [0, 0.9],
-      initialBreakpoint: 0.9,
     });
     await modal.present();
   }

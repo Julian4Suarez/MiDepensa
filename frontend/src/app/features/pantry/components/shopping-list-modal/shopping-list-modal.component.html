@@ -12,11 +12,18 @@
 <ion-content>
   @if (text()) {
     <pre class="preview">{{ text() }}</pre>
-    <ion-button expand="block" class="copy" (click)="copy()">
-      <ion-icon slot="start" name="copy-outline" />
-      Copy
-    </ion-button>
   } @else {
     <p class="empty text-muted">There are no products in the cart.</p>
   }
 </ion-content>
+
+@if (text()) {
+  <ion-footer>
+    <ion-toolbar>
+      <ion-button expand="block" class="copy" (click)="copy()">
+        <ion-icon slot="start" name="copy-outline" />
+        Copy
+      </ion-button>
+    </ion-toolbar>
+  </ion-footer>
+}
